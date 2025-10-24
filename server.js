@@ -1,0 +1,11 @@
+const express = require('express');
+const next = require('next');
+const cors = require('cors');
+require('dotenv').config();
+const connectDB = require('./lib/mongodb');
+const dev = process.env.NODE_ENV !== 'production';
+const nextApp = next({ dev });
+const handle = nextApp.getRequestHandler();
+const app = express();
+app.use(cors());
+app.use(express.json());
