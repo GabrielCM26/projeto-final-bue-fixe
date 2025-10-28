@@ -52,10 +52,36 @@ app.post("/api/profiles", async (req, res) => {
 
 // ===== STEAM LOGIN=====
 
+// exemplo de implementação do login(ainda é preciso perceber como funciona)
 
+// const session = require('express-session');
+// const passport = require('passport');
+// const SteamStrategy = require('passport-steam').Strategy;
 
+// app.use(session({ secret: 'your-secret', resave: false, saveUninitialized: false }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
+// passport.serializeUser((user, done) => done(null, user));
+// passport.deserializeUser((user, done) => done(null, user));
 
+// passport.use(new SteamStrategy({
+//     returnURL: 'http://localhost:3000/auth/steam/return',
+//     realm: 'http://localhost:3000/',
+//     apiKey: 'YOUR_STEAM_API_KEY'
+// }, (identifier, profile, done) => {
+//     // You can access profile.id (steamID) and displayName here
+//     return done(null, profile);
+// }));
+
+// app.get('/auth/steam', passport.authenticate('steam'));
+// app.get('/auth/steam/return', 
+//     passport.authenticate('steam', { failureRedirect: '/' }),
+//     (req, res) => {
+//         // Successful authentication
+//         res.redirect('/');
+//     }
+// );
 
 
 // ===== INICIALIZAÇÃO DO SERVIDOR (também não se deve mexer)=====
