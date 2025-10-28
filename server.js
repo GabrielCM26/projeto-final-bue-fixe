@@ -11,18 +11,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
-const {getPlayerProfiles } = require("./lib/steamapi");
+const Game = require("./src/models/game");
+const {getPlayerProfiles, getOwnedGames } = require("./lib/steamapi");
 const mongoose = require("mongoose");
 
 // ===== ENDPOINTS DA API =====
 
-
+// ===== GET =====
 
 app.get("/api/profiles/:steamID", async (req, res) => {
   const { steamID } = req.params;
 
   try {
-    const profile = await Profile.findOne({ steamID });
+    const profile = await Profile.find({ steamID });
     if (!profile) {
       return res.status(404).json({ message: "Perfil não encontrado" });
     }
@@ -33,6 +34,19 @@ app.get("/api/profiles/:steamID", async (req, res) => {
   }
 });
 
+app.get("/api/games/:steamID", async (req, res) => {
+  const { steamID } = req.params;
+
+  try {
+    const games = await Game.find({ steamID });
+    res.json(games);
+  } catch (error) {
+    console.error("Erro ao buscar jogos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// ===== POST =====
 
 
 //posts separados para perfil de user e amigos
@@ -63,6 +77,19 @@ app.post("/api/friend-profiles", async (req, res) => {
     res.status(201).json(profiles);
   } catch (error) {
     console.error("Erro ao criar perfil:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+app.post("/api/games", async (req, res) => {
+  const profileID = req.body.steamID;
+  const ownedGames = await getOwnedGames(profileID);
+
+  try {
+    const games = await Game.insertMany(ownedGames);
+    res.status(201).json(games);
+  } catch (error) {
+    console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
