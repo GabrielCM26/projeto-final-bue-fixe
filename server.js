@@ -32,6 +32,11 @@ app.get("api/profiles/:steamID", async (req, res) => {
 app.post("/api/profiles", async (req, res) => {
   const profileData = req.body;
 
+  //not sure how to do this yet (need to fetch friends from steamapi)
+  //   const {steamID} = req.params;
+  //   const friendIDs = await getfriendIDs(steamID);
+  //   const friendsProfiles = await getPlayerProfiles(friendIDs);
+
   try {
     const profile = await Profile.findOneAndUpdate(
       { steamID: profileData.steamID },
@@ -46,6 +51,8 @@ app.post("/api/profiles", async (req, res) => {
 });
 
 // ===== STEAM LOGIN=====
+
+
 
 
 
