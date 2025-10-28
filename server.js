@@ -37,10 +37,11 @@ app.get("/api/profiles/:steamID", async (req, res) => {
 
 //posts separados para perfil de user e amigos
 app.post("/api/profiles", async (req, res) => {
-  const profileData = req.body;
+  const profileID = req.body.steamID;
+  const profileData = await getPlayerProfiles(profileID);
   try {
     const profile = await Profile.findOneAndUpdate(
-      { steamID: profileData.steamID },
+      { steamID: profileID },
       profileData,
       { new: true, upsert: true }
     );
@@ -67,6 +68,9 @@ app.post("/api/friend-profiles", async (req, res) => {
 });
 
 // ===== STEAM LOGIN=====
+
+
+
 
 
 
