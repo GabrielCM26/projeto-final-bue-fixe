@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
 const Game = require("./src/models/game");
-const { getPlayerProfiles, getOwnedGames } = require("./lib/steamapi");
+const { getPlayerProfiles, getOwnedGames, getAchievements } = require("./lib/steamapi");
 const mongoose = require("mongoose");
 
 // ===== ENDPOINTS DA API =====
@@ -80,26 +80,41 @@ app.post("/api/friend-profiles", async (req, res) => {
 
 app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
+ 
 
   try {
     const ownedGames = await getOwnedGames(profileID);
-
-    const mappedGames = ownedGames.map((game) => ({
-      steamid: profileID,
-      appid: game.appid,
-      name: game.name,
-      img_icon_url: game.img_icon_url,
-      playtime_forever: game.playtime_forever,
-      price: game.price || 0,
+ 
+    const gamesWithAchievements = await Promise.all(ownedGames.map(async (game) => {  
+         const achievements = await getAchievements(profileID, game.appid);
+         const mappedAchievements = (achievements || []).map(a => ({
+           apiname: a.apiname,
+           achieved: !!a.achieved,
+           unlocktime: a.unlocktime ? new Date(a.unlocktime * 1000) : null,
+         }));
+    
+      return {
+        steamid: profileID,
+        appid: game.appid,
+        name: game.name,
+        img_icon_url: game.img_icon_url,
+        playtime_forever: game.playtime_forever,
+        achievements: mappedAchievements,
+      };
     }));
 
-    const games = await Game.insertMany(mappedGames);
+      
+
+    const games = await Game.insertMany(gamesWithAchievements)
     res.status(201).json(games);
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
+
+
+
 
 // ===== STEAM LOGIN=====
 
