@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 // User profile schema
 const profileSchema = new mongoose.Schema({
-  steamID: { type: Number, unique: true },
+  steamid: { type: String },
   avatar: { type: String },
   personaname: { type: String },
   profileurl: { type: String },
