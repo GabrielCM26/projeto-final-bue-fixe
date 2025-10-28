@@ -51,11 +51,12 @@ app.get("/api/games/:steamid", async (req, res) => {
 //posts separados para perfil de user e amigos
 app.post("/api/profiles", async (req, res) => {
   const profileID = req.body.steamid;
-  const profileData = await getPlayerProfiles(profileID);
+  const profileDataArr = await getPlayerProfiles(profileID);
+  const profileData = profileDataArr.find(p => p.steamid === profileID);
   try {
     const profile = await Profile.findOneAndUpdate(
-      { steamID: profileID },
-      profileData,
+      { steamid: profileID },
+       { $set: profileData },
       { new: true, upsert: true }
     );
     res.status(201).json(profile);
@@ -140,7 +141,7 @@ passport.use(
       apiKey: "8CE04F099719568B5A97C3BCFCDB1C37",
     },
     (identifier, profile, done) => {
-      return done(null, { steamID: profile.id });
+      return done(null, { steamid: profile.id });
     }
   )
 );
@@ -152,7 +153,7 @@ app.get(
   (req, res) => {
     // Successful authentication
     console.log("req.user:", req.user);
-    res.json({ steamID: req.user.id });
+    res.json({ steamid: req.user.steamid });
   }
 );
 
