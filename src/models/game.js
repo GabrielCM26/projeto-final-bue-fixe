@@ -4,6 +4,8 @@ const Achievement = require("./achievements");
 const gameSchema = new mongoose.Schema({
   steamID: { type: Number, unique: true, required: true },
   appID: { type: Number, required: true },
+  name: { type: String, required: true },
+  img_icon_url: { type: String },
   timePlayed: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],

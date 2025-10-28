@@ -11,10 +11,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
+const {getPlayerProfiles } = require("./lib/steamapi");
+const mongoose = require("mongoose");
 
 // ===== ENDPOINTS DA API =====
 
-app.get("api/profiles/:steamID", async (req, res) => {
+
+
+app.get("/api/profiles/:steamID", async (req, res) => {
   const { steamID } = req.params;
 
   try {
@@ -29,14 +33,11 @@ app.get("api/profiles/:steamID", async (req, res) => {
   }
 });
 
+
+
+//posts separados para perfil de user e amigos
 app.post("/api/profiles", async (req, res) => {
-//   const profileData = req.body;
-
-  //not sure how to do this yet (need to fetch friends from steamapi)
-    const {steamID} = req.params;
-    const friendIDs = await getfriendIDs(steamID);
-    const friendsProfiles = await getPlayerProfiles(friendIDs);
-
+  const profileData = req.body;
   try {
     const profile = await Profile.findOneAndUpdate(
       { steamID: profileData.steamID },
@@ -44,6 +45,21 @@ app.post("/api/profiles", async (req, res) => {
       { new: true, upsert: true }
     );
     res.status(201).json(profile);
+  } catch (error) {
+    console.error("Erro ao criar perfil:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+
+//posts separados para perfil de user e amigos
+app.post("/api/friend-profiles", async (req, res) => {
+ 
+  try { 
+    const friendProfiles = await getPlayerProfiles(req.body);
+    const profiles = await Profile.insertMany(friendProfiles);
+   
+    res.status(201).json(profiles);
   } catch (error) {
     console.error("Erro ao criar perfil:", error);
     res.status(500).json({ message: "Erro interno do servidor" });

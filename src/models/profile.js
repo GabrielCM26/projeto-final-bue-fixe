@@ -18,7 +18,6 @@ const profileSchema = new mongoose.Schema({
 module.exports =
   mongoose.models.Profile || mongoose.model("Profile", profileSchema);
 
-findOneAndUpdate({ steamID: friend.steamid }, { upsert: true, new: true });
 
 //usar mongoose.schema.Types.ObjectId quando é algo partilhado entre vários documentos, ex: géneros dos jogos
 //usar [SchemaName.schema] quando é algo específico daquele documento, ex: achievements de um jogo específico
