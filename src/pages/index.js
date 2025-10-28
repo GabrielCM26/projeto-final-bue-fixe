@@ -6,12 +6,13 @@ export default function Home() {
     <main className="relative flex min-h-screen items-center justify-center bg-black overflow-hidden">
 
       <Image
-        src="/loginCard.png"
+        src="/loginCard.jpg"
         alt="PlayDex wallpaper"
         fill
         priority
-        className="object-contain bg-black"
-        sizes="100vw"
+        className="object-contain bg-black object-[center_50%] rounded-3xl"
+        
+        sizes="400vw"
       />
 
       <div className="relative z-10">
