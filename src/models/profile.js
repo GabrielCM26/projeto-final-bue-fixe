@@ -13,6 +13,7 @@ const profileSchema = new mongoose.Schema({
   personastateflags: { type: Number },
   steamLevel: { type: Number },
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+  friendsSince: { type: Date }
 });
 
 module.exports =
