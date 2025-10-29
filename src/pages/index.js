@@ -4,9 +4,11 @@ import LoginCard from "@/components/LoginCard";
 export default function Home() {
   return (
     <main className="relative flex min-h-screen items-center justify-center bg-black overflow-hidden">
+      <div className="bg-[url(./public/Login_BG.png)]">
 
-      <Image
-        src="/loginCard.jpg"
+      </div>
+      <img
+        src="/Login_BG.png"
         alt="PlayDex wallpaper"
         fill
         priority
