@@ -89,10 +89,11 @@ app.post("/api/games", async (req, res) => {
  
     const gamesWithAchievements = await Promise.all(ownedGames.map(async (game) => {  
          const achievements = await checkAchievements(profileID, game.appid);
+         console.log(achievements);
          const mappedAchievements = (achievements || []).map(a => ({
            apiname: a.apiname,
            achieved: !!a.achieved,
-           unlocktime: a.unlocktime ? new Date(a.unlocktime * 1000) : null,
+           unlocktime: a.unlocktime 
          }));
     
       return {
