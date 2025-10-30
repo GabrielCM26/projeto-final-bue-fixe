@@ -1,14 +1,18 @@
 const mongoose = require("mongoose");
 const Achievement = require("./achievements");
+const { unique } = require("next/dist/build/utils");
 
 const gameSchema = new mongoose.Schema({
-  steamID: { type: Number, unique: true, required: true },
-  appID: { type: Number, required: true },
-  timePlayed: { type: Number },
+  steamid: { type: String },
+  appid: { type: Number },
+  name: { type: String},
+  img_icon_url: { type: String },
+  playtime_forever: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],
   genre: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
 });
+
 
 module.exports = mongoose.models.Game || mongoose.model("Game", gameSchema);
 
