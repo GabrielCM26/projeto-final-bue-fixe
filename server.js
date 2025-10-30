@@ -12,7 +12,11 @@ app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
 const Game = require("./src/models/game");
-const { getPlayerProfiles, getOwnedGames, checkAchievements } = require("./lib/steamapi");
+const {
+  getPlayerProfiles,
+  getOwnedGames,
+  checkAchievements,
+} = require("./lib/steamapi");
 const mongoose = require("mongoose");
 
 // ===== ENDPOINTS DA API =====
@@ -48,24 +52,25 @@ app.get("/api/games/:steamid", async (req, res) => {
 
 // ===== POST =====
 
-//posts separados para perfil de user e amigos
+
 app.post("/api/profiles", async (req, res) => {
   const profileID = req.body.steamid;
- 
+
   try {
-    const {userProfile, friendsProfiles} = await getPlayerProfiles(profileID);
+    const { userProfile, friendsProfiles } = await getPlayerProfiles(profileID);
 
-    friendDocs = await Promise.all(friendsProfiles.map(async (friendProfile) => {
-       return await Profile.findOneAndUpdate(
-        { steamid: friendProfile.steamid },
-        { $set: friendProfile },
-        { new: true, upsert: true }
-      );
-    }));
+    friendDocs = await Promise.all(
+      friendsProfiles.map(async (friendProfile) => {
+        return await Profile.findOneAndUpdate(
+          { steamid: friendProfile.steamid },
+          { $set: friendProfile },
+          { new: true, upsert: true }
+        );
+      })
+    );
 
-    userProfile.friends = friendDocs.map(doc => doc._id);
-    
-    
+    userProfile.friends = friendDocs.map((doc) => doc._id);
+
     const profile = await Profile.findOneAndUpdate(
       { steamid: profileID },
       { $set: userProfile },
@@ -78,46 +83,49 @@ app.post("/api/profiles", async (req, res) => {
   }
 });
 
-
-
 app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
- 
 
   try {
     const ownedGames = await getOwnedGames(profileID);
- 
-    const gamesWithAchievements = await Promise.all(ownedGames.map(async (game) => {  
-         const achievements = await checkAchievements(profileID, game.appid);
-         console.log(achievements);
-         const mappedAchievements = (achievements || []).map(a => ({
-           apiname: a.apiname,
-           achieved: !!a.achieved,
-           unlocktime: a.unlocktime 
-         }));
-    
-      return {
-        steamid: profileID,
-        appid: game.appid,
-        name: game.name,
-        img_icon_url: game.img_icon_url,
-        playtime_forever: game.playtime_forever,
-        achievements: mappedAchievements,
-      };
-    }));
 
-      
+    const gamesWithAchievements = await Promise.all(
+      ownedGames.map(async (game) => {
+        const achievements = await checkAchievements(profileID, game.appid);
+        //  console.log(achievements);
+        const mappedAchievements = (achievements || []).map((a) => ({
+          apiname: a.apiname,
+          achieved: !!a.achieved,
+          unlocktime: a.unlocktime,
+        }));
 
-    const games = await Game.insertMany(gamesWithAchievements);
+        return {
+          steamid: profileID,
+          appid: game.appid,
+          name: game.name,
+          img_icon_url: game.img_icon_url,
+          playtime_forever: game.playtime_forever,
+          achievements: mappedAchievements,
+        };
+      })
+    );
+
+    const games = await Promise.all(
+      gamesWithAchievements.map(async (game) => {
+        return await Game.findOneAndUpdate(
+          { steamid: game.steamid, appid: game.appid },
+          { $set: game },
+          { new: true, upsert: true }
+        );
+      })
+    );
+
     res.status(201).json(games);
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
-
-
-
 
 // ===== STEAM LOGIN=====
 
