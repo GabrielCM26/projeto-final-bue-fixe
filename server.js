@@ -98,7 +98,7 @@ app.post("/api/games", async (req, res) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-
+    
 
     // const friendGamesWithAchievements = await Promise.all(
     //   friendsSteamIDs.friendIDs.map(async (friend) => {
@@ -131,16 +131,11 @@ app.post("/api/games", async (req, res) => {
     //   })
     // );
 
-
-    const ApiCalls = 50
-    let gamesWithAchievements = [];
-
-    for (let i = 0; i < ownedGames.length; i++) {
-      const batch = ownedGames.slice(i, i + ApiCalls);
-      const gamesWithAchievementsBatch = await Promise.all(
-        batch.map(async (game) => {
-          const genres = await getGameGenres(game.appid);
+    const gamesWithAchievements = await Promise.all(
+      ownedGames.map(async (game) => {
+        const genres = await getGameGenres(game.appid);
         const price = await getGamePrice(game.appid);
+        const priceValue = (typeof price === 'number' && !isNaN(price)) ? price : 0;
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
         console.log("Game:", game.name, "Genres:", genres, "Price:", price);
@@ -158,15 +153,11 @@ app.post("/api/games", async (req, res) => {
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: genres,
-          price: price ? price : 0
+          price: priceValue
         };
       })
     );
-      gamesWithAchievements.push(...gamesWithAchievementsBatch);
-      if (i + ApiCalls < ownedGames.length) {
-        await sleep(200); // wait 200 milliseconds between batches
-      }
-    }
+
     const games = await Promise.all(
       gamesWithAchievements.map(async (game) => {
         return await Game.findOneAndUpdate(
