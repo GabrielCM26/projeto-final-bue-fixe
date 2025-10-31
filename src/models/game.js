@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Achievement = require("./achievements");
 const { unique } = require("next/dist/build/utils");
+const Genre = require("./genre");
 
 const gameSchema = new mongoose.Schema({
   steamid: { type: String },
@@ -10,7 +11,7 @@ const gameSchema = new mongoose.Schema({
   playtime_forever: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],
-  genre: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
+  genre: [Genre.schema],
 });
 
 

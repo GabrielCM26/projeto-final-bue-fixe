@@ -139,8 +139,9 @@ app.post("/api/games", async (req, res) => {
         const priceValue = (typeof price === 'number' && !isNaN(price)) ? price : 0;
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
-        console.log("Game:", game.name, "Genres:", genres, "Price:", price);
-        mappedGenres = genres.map(g => ({ id: g.id, description: g.description }));
+        // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
+        const mappedGenres = genres.map(g => ({ id: g.id, description: g.description }));
+        console.log(mappedGenres);
         const mappedAchievements = (achievements || []).map((a) => ({
           apiname: a.apiname,
           achieved: !!a.achieved,
@@ -157,16 +158,6 @@ app.post("/api/games", async (req, res) => {
           genres: mappedGenres,
           price: priceValue
         };
-      })
-    );
-
-    const genres= await Promise.all(
-      mappedGenres.map(async (genre) => {
-        return await Genre.findOneAndUpdate(
-          { id: genre.id },
-          { $set: genre },
-          { new: true, upsert: true }
-        );
       })
     );
 
@@ -190,7 +181,7 @@ app.post("/api/games", async (req, res) => {
 //       })
 //     );
 
-    res.status(201).json({games, genres} );
+    res.status(201).json(games);
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
