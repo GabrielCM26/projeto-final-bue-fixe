@@ -18,7 +18,7 @@ const {
   checkAchievements,
   getfriendIDs,
   getGameGenres,
-  getGamePrice
+  getGamePrice,
 } = require("./lib/steamapi");
 const mongoose = require("mongoose");
 
@@ -90,46 +90,52 @@ app.post("/api/games", async (req, res) => {
 
   try {
     const ownedGames = await getOwnedGames(profileID);
-    const friendsSteamIDs  = await getfriendIDs(profileID);
+    const friendsSteamIDs = await getfriendIDs(profileID);
     console.log("OwnedGames:", ownedGames);
     console.log("FriendsSteamIDs:", friendsSteamIDs);
 
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    
+    const friendGamesWithAchievements = await Promise.all(
+      friendsSteamIDs.friendIDs.map(async (friend) => {
+        const friendGames = await getOwnedGames(friend);
+        if (friendGames.length === 0) {
+          return [];
+        }
+        // console.log("friendGames:", friendGames);
+        const gamesWithAchievements = await Promise.all(
+          friendGames.map(async (game) => {
+            const genres = await getGameGenres(game.appid);
+            const price = await getGamePrice(game.appid);
+            const achievements = await checkAchievements(friend, game.appid);
+            const mappedGenres = genres.map((g) => ({
+              id: g.id,
+              description: g.description,
+            }));
+            const mappedAchievements = (achievements || []).map((a) => ({
+              apiname: a.apiname,
+              achieved: !!a.achieved,
+              unlocktime: a.unlocktime,
+            }));
 
-    // const friendGamesWithAchievements = await Promise.all(
-    //   friendsSteamIDs.friendIDs.map(async (friend) => {
-    //     const friendGames = await getOwnedGames(friend);
-    //     if (friendGames.length === 0) {
-    //       return [];
-    //     }
-    //     // console.log("friendGames:", friendGames);
-    //     const gamesWithAchievements = await Promise.all(
-    //       friendGames.map(async (game) => {
-    //         const achievements = await checkAchievements(friend, game.appid);
-    //         const mappedAchievements = (achievements || []).map((a) => ({
-    //           apiname: a.apiname,
-    //           achieved: !!a.achieved,
-    //           unlocktime: a.unlocktime,
-    //         }));
+            return {
+              steamid: friend,
+              appid: game.appid,
+              name: game.name,
+              img_icon_url: game.img_icon_url,
+              playtime_forever: game.playtime_forever,
+              achievements: mappedAchievements,
+              genres: mappedGenres,
+              price: price ? price / 100 : 0,
+            };
+          })
+        );
 
-    //         return {
-    //           steamid: friend,
-    //           appid: game.appid,
-    //           name: game.name,
-    //           img_icon_url: game.img_icon_url,
-    //           playtime_forever: game.playtime_forever,
-    //           achievements: mappedAchievements,
-    //         };
-    //       })
-    //     );
-
-    //     return gamesWithAchievements;
-    //   })
-    // );
+        return gamesWithAchievements;
+      })
+    );
 
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
@@ -138,7 +144,10 @@ app.post("/api/games", async (req, res) => {
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
         // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
-        const mappedGenres = genres.map(g => ({ id: g.id, description: g.description }));
+        const mappedGenres = genres.map((g) => ({
+          id: g.id,
+          description: g.description,
+        }));
         console.log(mappedGenres);
         const mappedAchievements = (achievements || []).map((a) => ({
           apiname: a.apiname,
@@ -168,18 +177,18 @@ app.post("/api/games", async (req, res) => {
         );
       })
     );
-//  const flattenedFriendGames = friendGamesWithAchievements.flat();
-//     const friendGames = await Promise.all(
-//       flattenedFriendGames.map(async (game) => {
-//         return await Game.findOneAndUpdate(
-//           { steamid: game.steamid, appid: game.appid },
-//           { $set: game },
-//           { new: true, upsert: true }
-//         );
-//       })
-//     );
+     const flattenedFriendGames = friendGamesWithAchievements.flat();
+        const friendGames = await Promise.all(
+          flattenedFriendGames.map(async (game) => {
+            return await Game.findOneAndUpdate(
+              { steamid: game.steamid, appid: game.appid },
+              { $set: game },
+              { new: true, upsert: true }
+            );
+          })
+        );
 
-    res.status(201).json(games);
+    res.status(201).json({ games, friendGames });
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
