@@ -16,6 +16,7 @@ const {
   getPlayerProfiles,
   getOwnedGames,
   checkAchievements,
+  getfriendIDs,
 } = require("./lib/steamapi");
 const mongoose = require("mongoose");
 
@@ -52,7 +53,6 @@ app.get("/api/games/:steamid", async (req, res) => {
 
 // ===== POST =====
 
-
 app.post("/api/profiles", async (req, res) => {
   const profileID = req.body.steamid;
 
@@ -76,7 +76,7 @@ app.post("/api/profiles", async (req, res) => {
       { $set: userProfile },
       { new: true, upsert: true }
     );
-    res.status(201).json(profile);
+    res.status(201).json({ userProfile: profile, friendProfiles: friendDocs });
   } catch (error) {
     console.error("Erro ao criar perfil:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
@@ -88,6 +88,40 @@ app.post("/api/games", async (req, res) => {
 
   try {
     const ownedGames = await getOwnedGames(profileID);
+    const friendsSteamIDs  = await getfriendIDs(profileID);
+    console.log("friendsSteamIDs:", friendsSteamIDs);
+   
+
+    const friendGamesWithAchievements = await Promise.all(
+      friendsSteamIDs.friendIDs.map(async (friend) => {
+        const friendGames = await getOwnedGames(friend);
+        if (friendGames.length === 0) {
+          return [];
+        }
+        // console.log("friendGames:", friendGames);
+        const gamesWithAchievements = await Promise.all(
+          friendGames.map(async (game) => {
+            const achievements = await checkAchievements(friend, game.appid);
+            const mappedAchievements = (achievements || []).map((a) => ({
+              apiname: a.apiname,
+              achieved: !!a.achieved,
+              unlocktime: a.unlocktime,
+            }));
+
+            return {
+              steamid: friend,
+              appid: game.appid,
+              name: game.name,
+              img_icon_url: game.img_icon_url,
+              playtime_forever: game.playtime_forever,
+              achievements: mappedAchievements,
+            };
+          })
+        );
+
+        return gamesWithAchievements;
+      })
+    );
 
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
@@ -119,8 +153,18 @@ app.post("/api/games", async (req, res) => {
         );
       })
     );
+ const flattenedFriendGames = friendGamesWithAchievements.flat();
+    const friendGames = await Promise.all(
+      flattenedFriendGames.map(async (game) => {
+        return await Game.findOneAndUpdate(
+          { steamid: game.steamid, appid: game.appid },
+          { $set: game },
+          { new: true, upsert: true }
+        );
+      })
+    );
 
-    res.status(201).json(games);
+    res.status(201).json({ userGames: games, friendsGames: friendGames });
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
