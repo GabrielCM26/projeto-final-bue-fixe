@@ -140,6 +140,7 @@ app.post("/api/games", async (req, res) => {
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
         console.log("Game:", game.name, "Genres:", genres, "Price:", price);
+        mappedGenres = genres.map(g => ({ id: g.id, description: g.description }));
         const mappedAchievements = (achievements || []).map((a) => ({
           apiname: a.apiname,
           achieved: !!a.achieved,
@@ -153,19 +154,14 @@ app.post("/api/games", async (req, res) => {
           img_icon_url: game.img_icon_url,
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
-          genres: genres,
+          genres: mappedGenres,
           price: priceValue
         };
       })
     );
-    const genresSet = new Set();
-    gamesWithAchievements.forEach(game => {
-      if (Array.isArray(game.genres)) {
-        game.genres.forEach(genre => genresSet.add(genre));
-      }
-    });
+
     const genres= await Promise.all(
-      Array.from(genresSet).map(async (genre) => {
+      mappedGenres.map(async (genre) => {
         return await Genre.findOneAndUpdate(
           { id: genre.id },
           { $set: genre },
@@ -173,6 +169,7 @@ app.post("/api/games", async (req, res) => {
         );
       })
     );
+
     const games = await Promise.all(
       gamesWithAchievements.map(async (game) => {
         return await Game.findOneAndUpdate(
