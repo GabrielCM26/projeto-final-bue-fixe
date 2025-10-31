@@ -107,13 +107,7 @@ app.post("/api/games", async (req, res) => {
         // console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
-            const genres = await getGameGenres(game.appid);
-            const price = await getGamePrice(game.appid);
             const achievements = await checkAchievements(friend, game.appid);
-            const mappedGenres = genres.map((g) => ({
-              id: g.id,
-              description: g.description,
-            }));
             const mappedAchievements = (achievements || []).map((a) => ({
               apiname: a.apiname,
               achieved: !!a.achieved,
@@ -127,8 +121,6 @@ app.post("/api/games", async (req, res) => {
               img_icon_url: game.img_icon_url,
               playtime_forever: game.playtime_forever,
               achievements: mappedAchievements,
-              genres: mappedGenres,
-              price: price ? price / 100 : 0,
             };
           })
         );
