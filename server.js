@@ -12,7 +12,6 @@ app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
 const Game = require("./src/models/game");
-const Genre = require("./src/models/genre");
 const {
   getPlayerProfiles,
   getOwnedGames,

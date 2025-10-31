@@ -11,7 +11,7 @@ const gameSchema = new mongoose.Schema({
   playtime_forever: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],
-  genre: [Genre.schema],
+  genres: [{id: Number, description: String}],
 });
 
 
