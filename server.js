@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 const Profile = require("./src/models/profile");
 const Game = require("./src/models/game");
+const Genre = require("./src/models/genre");
 const {
   getPlayerProfiles,
   getOwnedGames,
@@ -157,7 +158,21 @@ app.post("/api/games", async (req, res) => {
         };
       })
     );
-
+    const genresSet = new Set();
+    gamesWithAchievements.forEach(game => {
+      if (Array.isArray(game.genres)) {
+        game.genres.forEach(genre => genresSet.add(genre));
+      }
+    });
+    const genres= await Promise.all(
+      Array.from(genresSet).map(async (genre) => {
+        return await Genre.findOneAndUpdate(
+          { id: genre.id },
+          { $set: genre },
+          { new: true, upsert: true }
+        );
+      })
+    );
     const games = await Promise.all(
       gamesWithAchievements.map(async (game) => {
         return await Game.findOneAndUpdate(
@@ -178,7 +193,7 @@ app.post("/api/games", async (req, res) => {
 //       })
 //     );
 
-    res.status(201).json(games );
+    res.status(201).json({games, genres} );
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
