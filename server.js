@@ -135,7 +135,6 @@ app.post("/api/games", async (req, res) => {
       ownedGames.map(async (game) => {
         const genres = await getGameGenres(game.appid);
         const price = await getGamePrice(game.appid);
-        const priceValue = (typeof price === 'number' && !isNaN(price)) ? price : 0;
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
         // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
@@ -155,7 +154,7 @@ app.post("/api/games", async (req, res) => {
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: mappedGenres,
-          price: priceValue
+          price: price ? price / 100 : 0,
         };
       })
     );
