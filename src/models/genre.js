@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const genreSchema = new mongoose.Schema({
-  id: { type: Number, required: true },
+  id: { type: Number},
   description: { type: String },
 });
 
