@@ -1,5 +1,9 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Jura } from "next/font/google";
+
+const juraFont = Jura({
+  subsets: ["latin"],
+  weight: "400",
+})
 
 export default function LoginCard() {
   const handleLogin = () => {
@@ -7,16 +11,18 @@ export default function LoginCard() {
   };
 
   return (
-    <div className=" w-[150px] h-[150px] bg-[#0d0f0e] rounded-2xl border border-[#58CE87] shadow-[0_0_15px_rgba(144,238,144,0.1)] items-center justify-center text-center">
-      <h2 className="text-neutral-400 mb-6">"logo" PlayDex</h2>
+    <div className=" w-[75vw] bg-black rounded-2xl border border-[#aae4c1] items-center justify-center text-center p-5 pb-10 md:w-[50vw]">
+      <h1 className={`text-white text-[24px] mb-15 mt-2 ${juraFont.className}`}>"logo" Play<span className="text-[#58CE87]">Dex</span></h1>
 
-      <button onClick={handleLogin} className="focus:outline-none">
+      <button onClick={handleLogin} className="mb-5">
         <img
-          src="https://web.archive.org/web/20150227040200im_/http://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_large_noborder.png"
+          src="/Steam_Login.png"
           alt="Sign in through Steam"
-          className="cursor-pointer w-48 hover:opacity-80 transition-opacity duration-200"
+          className="w-40 cursor-pointer"
         />
       </button>
+
+      <p className="text-neutral-500 text-sm"><i>To access this app, we ask that our users log in through their Steam account. We do not collect any sensitive information.</i></p>
     </div>
   );
 }
