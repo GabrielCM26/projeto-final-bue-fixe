@@ -9,7 +9,7 @@ const gameSchema = new mongoose.Schema({
   name: { type: String},
   img_icon_url: { type: String },
   playtime_forever: { type: Number },
-  price: { type: String },
+  price: { type: Number },
   achievements: [Achievement.schema],
   genres: [{id: Number, description: String}],
 });
