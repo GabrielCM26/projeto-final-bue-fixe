@@ -143,7 +143,11 @@ app.post("/api/games", async (req, res) => {
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
         const genres = await getGameGenres(game.appid);
-        const price = await getGamePrice(game.appid);
+        // const price = await getGamePrice(game.appid);
+        for (const game of ownedGames) {
+          await getGamePrice(game.appid);
+          await sleep(100); 
+        }
         const achievements = await checkAchievements(profileID, game.appid);
         //  console.log(achievements);
         // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
