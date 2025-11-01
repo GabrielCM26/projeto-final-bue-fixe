@@ -101,8 +101,8 @@ app.post("/api/games", async (req, res) => {
 
     const friendLimits = pRateLimit({
       interval: 1000,
-      rate: 150,
-      concurrency: 10
+      rate: 200,
+      concurrency: 20,
     });
     const friendGamesWithAchievements = await Promise.all(
       friendsSteamIDs.friendIDs.map(async (friend) => {
