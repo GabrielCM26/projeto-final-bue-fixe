@@ -18,7 +18,7 @@ export default function LoginCard() {
 
   return (
     <div className=" w-[75vw] bg-black rounded-2xl border border-[#aae4c1] items-center justify-center text-center p-5 pb-10 md:w-[50vw]">
-      <h1 className={`text-white text-[24px] mb-15 mt-2 ${juraFont.className}`}>"logo" Play<span className="text-[#58CE87]">Dex</span></h1>
+      <h1 className={`text-white text-[30px] mb-15 mt-2 ${juraFont.className} text-shadow-[0_0_3px_rgba(88,206,135,0.8)]`}>"logo" Play<span className="text-[#58CE87]">Dex</span></h1>
 
       <button onClick={handleLogin} className="mb-5">
         <img
