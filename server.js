@@ -91,8 +91,8 @@ app.post("/api/games", async (req, res) => {
   try {
     const ownedGames = await getOwnedGames(profileID);
     const friendsSteamIDs = await getfriendIDs(profileID);
-    console.log("OwnedGames:", ownedGames);
-    console.log("FriendsSteamIDs:", friendsSteamIDs);
+    // console.log("OwnedGames:", ownedGames);
+    // console.log("FriendsSteamIDs:", friendsSteamIDs);
 
     function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
@@ -112,6 +112,7 @@ app.post("/api/games", async (req, res) => {
               apiname: a.apiname,
               achieved: !!a.achieved,
               unlocktime: a.unlocktime,
+              globalAchievementPercentage: a.globalPercentage,
             }));
 
             return {
@@ -140,11 +141,12 @@ app.post("/api/games", async (req, res) => {
           id: g.id,
           description: g.description,
         }));
-        console.log(mappedGenres);
+        // console.log(mappedGenres);
         const mappedAchievements = (achievements || []).map((a) => ({
           apiname: a.apiname,
           achieved: !!a.achieved,
           unlocktime: a.unlocktime,
+          globalAchievementPercentage: a.globalPercentage,
         }));
 
         return {

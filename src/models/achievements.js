@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const achievementSchema = new mongoose.Schema({
-  apiname: { type: String, required: true },
-  achieved: { type: Boolean, required: true },
-  globalAchievementPercentage: { type: Number },
+  apiname: { type: String },
+  achieved: { type: Boolean },
+  globalAchievementPercentage: { type: String },
   unlocktime: { type: Date },
   icon: { type: String },
 });
