@@ -6,23 +6,41 @@ export default function Dashboard() {
   const { steamid } = router.query;
 
   const [profile, setProfile] = useState(null);
+  const [games, setGames] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
 
   useEffect(() => {
     if (!steamid) return;
 
-    async function loadProfile() {
+    async function loadData() {
       try {
-        const res = await fetch(`/api/profiles/${steamid}`);
-        const data = await res.json();
-        setProfile(data);
+        // PERFIL
+        const resProfile = await fetch(`/api/profiles/${steamid}`);
+        const dataProfile = await resProfile.json();
+        setProfile(dataProfile);
+        console.log("PROFILE DATA", dataProfile); 
+
+        // JOGOS
+        const resGames = await fetch(`/api/games/${steamid}`);
+        const dataGames = await resGames.json();
+        setGames(dataGames);
+        console.log("GAMES DATA", dataGames); 
+
+        // totalHours min
+        const totalMinutes = dataGames.reduce((acc, game) => {
+          return acc + (game.playtime_forever || 0);
+        }, 0);
+
+        // totalHours h
+        const hours = Math.round(totalMinutes / 60);
+        setTotalHours(hours);
+
       } catch (error) {
-        console.error("Failed to load profile:", error);
+        console.error("Failed to load profile/games:", error);
       }
     }
-    
 
-    loadProfile();
+    loadData();
   }, [steamid]);
 
   if (!profile) {
@@ -64,7 +82,7 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Barra */}
+        {/* Barra de Pesquisa */}
         <div className="bg-[#2B303B] rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-gray-400">
           <span>⌕</span>
           <input
@@ -77,10 +95,12 @@ export default function Dashboard() {
         {/* CONTEÚDO PRINCIPAL */}
         <div className="mt-10 flex flex-col gap-7">
           <div className="flex gap-2 mt-4 text-center">
-            
+
             {/* HOURS PLAYED */}
             <div className="flex-1 bg-[#2a2c33] rounded-md p-3 flex flex-col justify-between ">
-              <div className="text-white font-semibold text-lg ">1,239</div>
+              <div className="text-white font-semibold text-lg ">
+                {totalHours}
+              </div>
               <div className="text-[10px] text-gray-400 uppercase tracking-wide">
                 Hours played
               </div>
@@ -88,7 +108,9 @@ export default function Dashboard() {
 
             {/* GAMES OWNED */}
             <div className="flex-1 bg-[#2a2c33] rounded-md p-3 flex flex-col justify-between">
-              <div className="text-white font-semibold text-lg ">57</div>
+              <div className="text-white font-semibold text-lg ">
+                {games.length}
+              </div>
               <div className="text-[10px] text-gray-400 uppercase tracking-wide">
                 Games owned
               </div>
@@ -107,6 +129,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Suggested Games / Money Wasted */}
           <div className="flex gap-2 mt-2">
             {/* SUGGESTED GAMES */}
             <button className="flex-1 flex items-center justify-center gap-2 bg-[#2a2c33] rounded-md py-3 px-2 text-xs text-gray-300 hover:bg-[#34363d] transition">
@@ -124,7 +147,7 @@ export default function Dashboard() {
             <button className="flex-1 flex items-center justify-center gap-2 bg-[#2a2c33] rounded-md py-3 px-2 text-xs text-gray-300 hover:bg-[#34363d] transition">
               <img
                 src="/money.png"
-                alt="list icon"
+                alt="money icon"
                 className="w-9 h-9 opacity-80"
               />
               <span className="">
@@ -141,18 +164,27 @@ export default function Dashboard() {
             </div>
 
             <div className="flex justify-between">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden"
-                >
-                  <img
-                    src="/avatar-placeholder.png"
-                    alt={`Friend ${i}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+              {(Array.isArray(profile.friends) ? profile.friends.slice(0, 4) : []).map(
+                (friend, i) => (
+                  <div
+                    key={i}
+                    className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden"
+                    title={friend.personaname || "Friend"}
+                  >
+                    {friend.avatar ? (
+                      <img
+                        src={friend.avatar}
+                        alt={friend.personaname || "Friend avatar"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-[10px] text-gray-300 px-1 text-center leading-tight">
+                        {friend.personaname || "Friend"}
+                      </span>
+                    )}
+                  </div>
+                )
+              )}
             </div>
           </div>
 
@@ -179,6 +211,7 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Debug / info */}
         <div className="text-[10px] text-gray-500">
           steamid atual: {steamid || "(sem steamid )"}
         </div>
