@@ -163,7 +163,8 @@ app.get(
   (req, res) => {
     // Successful authentication
     console.log("req.user:", req.user);
-    res.json({ steamid: req.user.steamid });
+    //res.json({ steamid: req.user.steamid });
+    res.redirect(`/dashboard/${req.user.steamid}`);
   }
 );
 
