@@ -140,41 +140,37 @@ app.post("/api/games", async (req, res) => {
     //   })
     // );
 
-    const gamesWithAchievements = await Promise.all(
-      ownedGames.map(async (game) => {
-        const genres = await getGameGenres(game.appid);
-        // const price = await getGamePrice(game.appid);
-        for (const game of ownedGames) {
-          await getGamePrice(game.appid);
-          await sleep(100); 
-        }
-        const achievements = await checkAchievements(profileID, game.appid);
-        //  console.log(achievements);
-        // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
-        const mappedGenres = genres.map((g) => ({
-          id: g.id,
-          description: g.description,
-        }));
-        // console.log(mappedGenres);
-        const mappedAchievements = (achievements || []).map((a) => ({
-          apiname: a.apiname,
-          achieved: !!a.achieved,
-          unlocktime: a.unlocktime,
-          globalAchievementPercentage: a.globalPercentage,
-        }));
+    const gamesWithAchievements = [];
+    for (const game of ownedGames) {
+      const genres = await getGameGenres(game.appid);
+      const price = await getGamePrice(game.appid);
 
-        return {
-          steamid: profileID,
-          appid: game.appid,
-          name: game.name,
-          img_icon_url: game.img_icon_url,
-          playtime_forever: game.playtime_forever,
-          achievements: mappedAchievements,
-          genres: mappedGenres,
-          price: price ? price / 100 : 0,
-        };
-      })
-    );
+      const achievements = await checkAchievements(profileID, game.appid);
+      //  console.log(achievements);
+      // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
+      const mappedGenres = genres.map((g) => ({
+        id: g.id,
+        description: g.description,
+      }));
+      // console.log(mappedGenres);
+      const mappedAchievements = (achievements || []).map((a) => ({
+        apiname: a.apiname,
+        achieved: !!a.achieved,
+        unlocktime: a.unlocktime,
+        globalAchievementPercentage: a.globalPercentage,
+      }));
+
+      gamesWithAchievements.push({
+        steamid: profileID,
+        appid: game.appid,
+        name: game.name,
+        img_icon_url: game.img_icon_url,
+        playtime_forever: game.playtime_forever,
+        achievements: mappedAchievements,
+        genres: mappedGenres,
+        price: price ? price / 100 : 0,
+      });
+    }
 
     const games = await Promise.all(
       gamesWithAchievements.map(async (game) => {
@@ -186,7 +182,7 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
-    res.status(201).json({ games, /*friendGames */ });
+    res.status(201).json({ games /*friendGames */ });
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
