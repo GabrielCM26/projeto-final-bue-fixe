@@ -1,9 +1,15 @@
 import { Jura } from "next/font/google";
+import { Akshar } from "next/font/google";
 
 const juraFont = Jura({
   subsets: ["latin"],
   weight: "400",
-})
+});
+
+const aksharFont = Akshar({
+  subsets: ["latin"],
+  weight: "variable",
+});
 
 export default function LoginCard() {
   const handleLogin = () => {
@@ -22,7 +28,7 @@ export default function LoginCard() {
         />
       </button>
 
-      <p className="text-neutral-500 text-sm"><i>To access this app, we ask that our users log in through their Steam account. We do not collect any sensitive information.</i></p>
+      <p className={`text-neutral-500 text-sm ${aksharFont.className} font-thin`}>To access this app, we ask that our users log in through their Steam account. We do not collect any sensitive information.</p>
     </div>
   );
 }
