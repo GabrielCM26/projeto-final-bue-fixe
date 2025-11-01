@@ -98,37 +98,47 @@ app.post("/api/games", async (req, res) => {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    const friendGamesWithAchievements = await Promise.all(
-      friendsSteamIDs.friendIDs.map(async (friend) => {
-        const friendGames = await getOwnedGames(friend);
-        if (friendGames.length === 0) {
-          return [];
-        }
-        // console.log("friendGames:", friendGames);
-        const gamesWithAchievements = await Promise.all(
-          friendGames.map(async (game) => {
-            const achievements = await checkAchievements(friend, game.appid);
-            const mappedAchievements = (achievements || []).map((a) => ({
-              apiname: a.apiname,
-              achieved: !!a.achieved,
-              unlocktime: a.unlocktime,
-              globalAchievementPercentage: a.globalPercentage,
-            }));
+    // const friendGamesWithAchievements = await Promise.all(
+    //   friendsSteamIDs.friendIDs.map(async (friend) => {
+    //     const friendGames = await getOwnedGames(friend);
+    //     if (friendGames.length === 0) {
+    //       return [];
+    //     }
+    //     // console.log("friendGames:", friendGames);
+    //     const gamesWithAchievements = await Promise.all(
+    //       friendGames.map(async (game) => {
+    //         const achievements = await checkAchievements(friend, game.appid);
+    //         const mappedAchievements = (achievements || []).map((a) => ({
+    //           apiname: a.apiname,
+    //           achieved: !!a.achieved,
+    //           unlocktime: a.unlocktime,
+    //           globalAchievementPercentage: a.globalPercentage,
+    //         }));
 
-            return {
-              steamid: friend,
-              appid: game.appid,
-              name: game.name,
-              img_icon_url: game.img_icon_url,
-              playtime_forever: game.playtime_forever,
-              achievements: mappedAchievements,
-            };
-          })
-        );
+    //         return {
+    //           steamid: friend,
+    //           appid: game.appid,
+    //           name: game.name,
+    //           img_icon_url: game.img_icon_url,
+    //           playtime_forever: game.playtime_forever,
+    //           achievements: mappedAchievements,
+    //         };
+    //       })
+    //     );
 
-        return gamesWithAchievements;
-      })
-    );
+    //     return gamesWithAchievements;
+    //   })
+    // );
+    // const flattenedFriendGames = friendGamesWithAchievements.flat();
+    // const friendGames = await Promise.all(
+    //   flattenedFriendGames.map(async (game) => {
+    //     return await Game.findOneAndUpdate(
+    //       { steamid: game.steamid, appid: game.appid },
+    //       { $set: game },
+    //       { new: true, upsert: true }
+    //     );
+    //   })
+    // );
 
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
@@ -171,18 +181,8 @@ app.post("/api/games", async (req, res) => {
         );
       })
     );
-     const flattenedFriendGames = friendGamesWithAchievements.flat();
-        const friendGames = await Promise.all(
-          flattenedFriendGames.map(async (game) => {
-            return await Game.findOneAndUpdate(
-              { steamid: game.steamid, appid: game.appid },
-              { $set: game },
-              { new: true, upsert: true }
-            );
-          })
-        );
 
-    res.status(201).json({ games, friendGames });
+    res.status(201).json({ games, /*friendGames */ });
   } catch (error) {
     console.error("Erro ao criar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
