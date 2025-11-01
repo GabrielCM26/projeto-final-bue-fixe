@@ -47,8 +47,8 @@ app.get("/api/games/:steamid", async (req, res) => {
   const { steamid } = req.params;
 
   try {
-    const games = await Game.findMany({ steamid });
-    res.json(games);
+    const games = await Game.find({ steamid });
+    res.json(games || []);
   } catch (error) {
     console.error("Erro ao buscar jogos:", error);
     res.status(500).json({ message: "Erro interno do servidor" });
@@ -244,7 +244,8 @@ app.get(
   (req, res) => {
     // Successful authentication
     console.log("req.user:", req.user);
-    res.json({ steamid: req.user.steamid });
+    //res.json({ steamid: req.user.steamid });
+    res.redirect(`/dashboard/${req.user.steamid}`);
   }
 );
 
