@@ -14,13 +14,14 @@ export default function Dashboard() {
 
     async function loadData() {
       try {
+        
         // PERFIL
         const resProfile = await fetch(`/api/profiles/${steamid}`);
         const dataProfile = await resProfile.json();
         setProfile(dataProfile);
         console.log("PROFILE DATA", dataProfile); 
 
-        // JOGOS
+        // Games  
         const resGames = await fetch(`/api/games/${steamid}`);
         const dataGames = await resGames.json();
         setGames(dataGames);
