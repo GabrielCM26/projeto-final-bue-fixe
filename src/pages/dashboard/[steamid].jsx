@@ -44,7 +44,6 @@ export default function Dashboard() {
 
         // BEST GAME (mais jogado)
         if (dataGames.length > 0) {
-          // pega o jogo com mais playtime
           const mostPlayed = [...dataGames].sort(
             (a, b) =>
               (b.playtime_forever || 0) - (a.playtime_forever || 0)
@@ -83,7 +82,7 @@ export default function Dashboard() {
             appid: mostPlayed.appid,
             name: mostPlayed.name,
             developer: mostPlayed.developer || "",
-            quote: "", // podes meter mais tarde
+            quote: "", 
             cover: coverUrl,
             hoursPlayed,
             achievementsDone,
@@ -133,7 +132,7 @@ export default function Dashboard() {
       >
         {/* HEADER */}
         <header className="grid grid-cols-3 items-center">
-          {/* Empty div for spacing */}
+         
           <div></div>
 
           {/* Logo */}
@@ -145,7 +144,7 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* User mini-profile (nome + avatar) */}
+         
           <div className="flex items-center gap-2 justify-end">
             <div className="text-sm text-gray-200 truncate max-w-24">
               {profile?.personaname || "user"}
