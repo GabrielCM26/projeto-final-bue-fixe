@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function InfoHandlers() {
+export default function UserProfile() {
 
     const [profile, setProfile] = useState(null);
     const [games, setGames] = useState([]);
@@ -32,90 +32,88 @@ export default function InfoHandlers() {
         loadData();
     }, [steamid]);
 
-    function UserProfile() {
-        return (
+    return (
+        <div>
             <div>
+
+                {/* Foto de perfil */}
+                <img
+                    src={profile.avatar}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                />
                 <div>
 
-                    {/* Foto de perfil */}
-                    <img
-                        src={profile.avatar}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                    />
+                    {/* Nome de Utilizador */}
+                    <h1>
+                        <div className="text-sm text-gray-200 truncate max-w-24">
+                            {profile?.personaname || "user"}
+                        </div>
+                    </h1>
                     <div>
 
-                        {/* Nome de Utilizador */}
-                        <h1>
-                            <div className="text-sm text-gray-200 truncate max-w-[6rem]">
-                                {profile?.personaname || "user"}
-                            </div>
-                        </h1>
-                        <div>
-
-                            {/* "Roles" com Genres */}
-                            <ul>
-                                <li>Rhythm Game</li>
-                            </ul>
-                        </div>
+                        {/* "Roles" com Genres */}
+                        <ul>
+                            <li>Rhythm Game</li>
+                        </ul>
                     </div>
-                </div>
-                {/* Div que demonstra as 10 achievements mais recentes (opcional); leva depois à página dos achievements todos */}
-                <div>
-                    <h3>My most recent achievements</h3>
-                    <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                            <div
-                                key={i}
-                                className="flex-1 bg-[#2a2c33] rounded-md p-4 flex items-center justify-center"
-                            >
-                                <img
-                                    src="game.chievements.icon"
-                                    alt={`Trophy ${i}`}
-                                    className="w-8 h-8 object-contain opacity-80"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <a href="/allAchievements">view all...</a>
-                </div>
-
-                {/* Fake div que leva à página dos amigos */}
-                <button>
-                    <p>I have {profile.friends.length} friends!</p>
-                </button>
-
-                {/* Div com botão e flavor text */}
-                <div>
-                    <p>Who has the most games platinumed? Click here to check!</p>
-                    <button>
-                        <p>Leaderboard</p>
-                        <div className="flex justify-between">
-                            {(Array.isArray(profile.friends) ? profile.friends.slice(0, 5) : []).map(
-                                (friend, i) => (
-                                    <div
-                                        key={i}
-                                        className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden"
-                                        title={friend.personaname || "Friend"}
-                                    >
-                                        {friend.avatar ? (
-                                            <img
-                                                src={friend.avatar}
-                                                alt={friend.personaname || "Friend avatar"}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-[10px] text-gray-300 px-1 text-center leading-tight">
-                                                {friend.personaname || "Friend"}
-                                            </span>
-                                        )}
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    </button>
                 </div>
             </div>
-        )
-    }
-}
+            {/* Div que demonstra as 10 achievements mais recentes (opcional); leva depois à página dos achievements todos */}
+            <div>
+                <h3>My most recent achievements</h3>
+                <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                        <div
+                            key={i}
+                            className="flex-1 bg-[#2a2c33] rounded-md p-4 flex items-center justify-center"
+                        >
+                            <img
+                                src="game.chievements.icon"
+                                alt={`Trophy ${i}`}
+                                className="w-8 h-8 object-contain opacity-80"
+                            />
+                        </div>
+                    ))}
+                </div>
+                <a href="/allAchievements">view all...</a>
+            </div>
+
+            {/* Fake div que leva à página dos amigos */}
+            <button>
+                <p>I have {profile.friends.length} friends!</p>
+            </button>
+
+            {/* Div com botão e flavor text */}
+            <div>
+                <p>Who has the most games platinumed? Click here to check!</p>
+                <button>
+                    <p>Leaderboard</p>
+                    <div className="flex justify-between">
+                        {(Array.isArray(profile.friends) ? profile.friends.slice(0, 5) : []).map(
+                            (friend, i) => (
+                                <div
+                                    key={i}
+                                    className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden"
+                                    title={friend.personaname || "Friend"}
+                                >
+                                    {friend.avatar ? (
+                                        <img
+                                            src={friend.avatar}
+                                            alt={friend.personaname || "Friend avatar"}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-[10px] text-gray-300 px-1 text-center leading-tight">
+                                            {friend.personaname || "Friend"}
+                                        </span>
+                                    )}
+                                </div>
+                            )
+                        )}
+                    </div>
+                </button>
+            </div>
+        </div>
+    )
+};
