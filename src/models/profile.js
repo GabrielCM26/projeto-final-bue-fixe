@@ -12,7 +12,7 @@ const profileSchema = new mongoose.Schema({
   loccityid: { type: Number },
   personastateflags: { type: Number },
   steamLevel: { type: Number },
-  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+  friends: [{ type: String }],
   friendsSince: { type: Date }
 });
 

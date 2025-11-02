@@ -3,7 +3,7 @@ require("dotenv").config({
 });
 const Game = require("../models/game");
 const connectDB = require("../../lib/mongodb");
-const achievements = require("@/models/achievements");
+const achievements = require("../models/achievements");
 
 async function getAccountInfo(steamid) {
   const userGames = await Game.find({ steamid });
@@ -31,19 +31,19 @@ async function getAccountInfo(steamid) {
   return accountDetails;
 }
 
-const allGenreTimes = gamesWithGenres.reduce((acc, game) => {
-  game.genres.forEach(genre => {
-    const genreName = genre.description;
-    const timePlayed = game.playtime_forever || 0;
-    acc[genreName] = (acc[genreName] || 0) + timePlayed;
-  });
-  return acc;
-}, {});
-const sortedGenres = Object.entries(allGenreTimes)
-  .map(([genre, timePlayed]) => ({ genre, timePlayed }))
-  .sort((a, b) => b.timePlayed - a.timePlayed);
+// const allGenreTimes = gamesWithGenres.reduce((acc, game) => {
+//   game.genres.forEach(genre => {
+//     const genreName = genre.description;
+//     const timePlayed = game.playtime_forever || 0;
+//     acc[genreName] = (acc[genreName] || 0) + timePlayed;
+//   });
+//   return acc;
+// }, {});
+// const sortedGenres = Object.entries(allGenreTimes)
+//   .map(([genre, timePlayed]) => ({ genre, timePlayed }))
+//   .sort((a, b) => b.timePlayed - a.timePlayed);
 
-return sortedGenres;
+// return sortedGenres;
 
 console.log(getAccountInfo("76561198006409530"));
 
@@ -61,6 +61,17 @@ async function top10Achievements(steamid) {
   const topAchievements = userGames.achievements.sort((a, b) => b.unlocktime - a.unlocktime).slice(0, 10);
   return topAchievements
 }
+
+
+// trying for a rank friends by number of platinumed games
+// async function friendsbyplat(steamid) {
+//   const userProfile = await profile.find({ steamid });
+//   const friends = userProfile.friends;
+//   const friendsGames = friends.map(async (friendProfile) => {
+//           return await Profile.find(
+//             { steamid: friendProfile.steamid },
+//   const gamesplated = friendsgames
+// }
 
 module.exports = { getAccountInfo, getGenrePlaytime };
 // função de teste

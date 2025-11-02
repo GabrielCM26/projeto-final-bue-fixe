@@ -86,12 +86,12 @@ export default function Dashboard() {
                             </div>
                         ))}
                     </div>
-                    <a>view all...</a>
+                    <a href="/allAchievements">view all...</a>
                 </div>
 
                 {/* Fake div que leva à página dos amigos */}
                 <button>
-                    <p>I have (X) friends!</p>
+                    <p>I have {profile.friends.length} friends!</p>
                 </button>
 
                 {/* Div com botão e flavor text */}
@@ -99,8 +99,32 @@ export default function Dashboard() {
                     <p>Who has the most games platinumed? Click here to check!</p>
                     <button>
                         <p>Leaderboard</p>
+                        <div className="flex justify-between">
+                            {(Array.isArray(profile.friends) ? profile.friends.slice(0, 5) : []).map(
+                                (friend, i) => (
+                                    <div
+                                        key={i}
+                                        className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden"
+                                        title={friend.personaname || "Friend"}
+                                    >
+                                        {friend.avatar ? (
+                                            <img
+                                                src={friend.avatar}
+                                                alt={friend.personaname || "Friend avatar"}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-[10px] text-gray-300 px-1 text-center leading-tight">
+                                                {friend.personaname || "Friend"}
+                                            </span>
+                                        )}
+                                    </div>
+                                )
+                            )}
+                        </div>
                     </button>
                 </div>
             </div>
         )
     }
+}
