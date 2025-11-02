@@ -1,3 +1,6 @@
+import { useRouter } from "next/router";
+
+
 export default function FriendList() {
 
     return (
@@ -26,7 +29,8 @@ export default function FriendList() {
                 <ul>
                     {/* Cada amigo */}
                     <div>
-                        
+                        <img />
+                        <p>Friend!</p>
                     </div>
                 </ul>
             </div>
