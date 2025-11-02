@@ -20,7 +20,7 @@ const {
   getGameGenres,
   getLowestGamePrice,
   findCommonGames,
-  preloadGameSchemas
+  preloadGameSchemas,
 } = require("./lib/steamapi");
 const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
@@ -69,7 +69,7 @@ app.post("/api/profiles", async (req, res) => {
       friendsProfiles.map(async (friendProfile) => {
         return await Profile.findOneAndUpdate(
           { steamid: friendProfile.steamid },
-          friendProfile ,
+          friendProfile,
           { new: true, upsert: true }
         );
       })
@@ -100,6 +100,7 @@ app.post("/api/games", async (req, res) => {
     await preloadGameSchemas(uniqueGames);
     // console.log("OwnedGames:", ownedGames);
     // console.log("FriendsSteamIDs:", friendsSteamIDs);
+    console.log("UniqueGames for schema preload:", uniqueGames);
 
     const friendLimits = pRateLimit({
       interval: 1000,
@@ -115,6 +116,11 @@ app.post("/api/games", async (req, res) => {
         console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
+            let price = 0;
+            if (game.playtime_forever === 0) {
+              price = await limit(() => getLowestGamePrice(game.appid));
+              price = price ? price : 0;
+            }
             const achievements = await friendLimits(() =>
               checkAchievements(friend, game.appid)
             );
@@ -134,6 +140,7 @@ app.post("/api/games", async (req, res) => {
               img_icon_url: game.img_icon_url,
               playtime_forever: game.playtime_forever,
               achievements: mappedAchievements,
+              price: price,
             };
           })
         );
