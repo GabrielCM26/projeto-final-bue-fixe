@@ -77,7 +77,7 @@ export default function InfoHandlers() {
                             </div>
                         ))}
                     </div>
-                    <a href="/allAchievements">view all...</a>
+                    <link href="/allAchievements">view all...</link>
                 </div>
 
                 {/* Fake div que leva à página dos amigos */}

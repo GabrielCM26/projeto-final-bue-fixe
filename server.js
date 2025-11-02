@@ -19,6 +19,8 @@ const {
   getfriendIDs,
   getGameGenres,
   getLowestGamePrice,
+  findCommonGames,
+  preloadGameSchemas
 } = require("./lib/steamapi");
 const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
@@ -93,6 +95,9 @@ app.post("/api/games", async (req, res) => {
   try {
     const ownedGames = await getOwnedGames(profileID);
     const friendsSteamIDs = await getfriendIDs(profileID);
+    const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
+    const uniqueGames = await findCommonGames(allSteamIDs);
+    await preloadGameSchemas(uniqueGames);
     // console.log("OwnedGames:", ownedGames);
     // console.log("FriendsSteamIDs:", friendsSteamIDs);
 
