@@ -1,11 +1,13 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import Loader from '@/components/Loader';
 
 export default function Dashboard() {
   const router = useRouter();
   const { steamid } = router.query;
 
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
 
@@ -13,19 +15,20 @@ export default function Dashboard() {
     if (!steamid) return;
 
     async function loadData() {
+      setLoading(true);
       try {
-        
+
         // PERFIL
         const resProfile = await fetch(`/api/profiles/${steamid}`);
         const dataProfile = await resProfile.json();
         setProfile(dataProfile);
-        console.log("PROFILE DATA", dataProfile); 
+        console.log("PROFILE DATA", dataProfile);
 
         // Games  
         const resGames = await fetch(`/api/games/${steamid}`);
         const dataGames = await resGames.json();
         setGames(dataGames);
-        console.log("GAMES DATA", dataGames); 
+        console.log("GAMES DATA", dataGames);
 
         // totalHours min
         const totalMinutes = dataGames.reduce((acc, game) => {
@@ -38,16 +41,19 @@ export default function Dashboard() {
 
       } catch (error) {
         console.error("Failed to load profile/games:", error);
+      } finally {
+        setLoading(false);
       }
+
     }
 
     loadData();
   }, [steamid]);
 
-  if (!profile) {
+  if (loading) {
     return (
-      <main className="min-h-screen text-white flex justify-center items-center p-4">
-        <div className="text-gray-500 text-sm">Loading...</div>
+      <main className="min-h-screen flex justify-center items-center p-4">
+        <Loader />
       </main>
     );
   }
@@ -73,12 +79,12 @@ export default function Dashboard() {
 
             <div className="w-6 h-6 rounded-full bg-gray-500 overflow-hidden">
               {profile?.avatar && (
-                <a href = "../userprofile/[steamid]">
-                <img
-                  src={profile.avatar}
-                  alt="avatar"
-                  className="w-full h-full object-cover"
-                />
+                <a href="../userprofile/[steamid]">
+                  <img
+                    src={profile.avatar}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
                 </a>
               )}
             </div>
