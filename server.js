@@ -19,8 +19,7 @@ const {
   getfriendIDs,
   getGameGenres,
   getLowestGamePrice,
-  findCommonGames,
-  preloadGameSchemas,
+  getGamePosters,
 } = require("./lib/steamapi");
 const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
@@ -93,7 +92,11 @@ app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
 
   try {
-    
+    const posterLimit = pRateLimit({
+      interval: 1000,
+      rate: 25,
+      concurrency: 2,
+    });
     
     const limit = pRateLimit({
       interval: 1000,
@@ -109,6 +112,7 @@ app.post("/api/games", async (req, res) => {
 
     const ownedGames = await gameLimit(() => getOwnedGames(profileID));
     const friendsSteamIDs = await getfriendIDs(profileID);
+  
     // const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
     // const uniqueGames = await findCommonGames(allSteamIDs);
     // await preloadGameSchemas(ownedGames);
@@ -171,6 +175,7 @@ app.post("/api/games", async (req, res) => {
 
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
+        const poster = await posterLimit(() => getGamePosters(game.appid));
         const genres = await getGameGenres(game.appid);
         let price = 0;
         if (game.playtime_forever === 0) {
@@ -200,6 +205,7 @@ app.post("/api/games", async (req, res) => {
           appid: game.appid,
           name: game.name,
           img_icon_url: game.img_icon_url,
+          poster: poster,
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: mappedGenres,
