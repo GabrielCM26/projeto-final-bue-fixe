@@ -1,12 +1,16 @@
-export default function Achievements() {
+export default function FriendList() {
 
     return (
         <main>
-            {/* Botão para voltar atrás */}
             <div>
+                {/* Botão para voltar atrás */}
                 <button>
-                    
+                    <p>hi</p>
                 </button>
+                {/* Título */}
+                <h1>
+                    Your Friends
+                </h1>
             </div>
             {/* Barra de pesquisa */}
             <div className="bg-[#2B303B] rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-gray-400">
@@ -18,9 +22,13 @@ export default function Achievements() {
                 />
             </div>
             <div>
-                {/* Título */}
-
                 {/* Lista de amigos */}
+                <ul>
+                    {/* Cada amigo */}
+                    <div>
+                        
+                    </div>
+                </ul>
             </div>
         </main>
     )
