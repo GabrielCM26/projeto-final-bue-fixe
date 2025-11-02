@@ -100,7 +100,7 @@ export default function Dashboard() {
           <div className="flex gap-2 mt-4 text-center">
 
             {/* HOURS PLAYED */}
-            <div className="flex-1 bg-[#2a2c33] rounded-md p-3 flex flex-col justify-between ">
+            <div className="flex-1 bg-[#2a2c33] rounded-md p-3 flex flex-col shadow justify-between ">
               <div className="text-white font-semibold text-lg ">
                 {totalHours}
               </div>
