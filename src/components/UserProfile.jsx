@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function infohandlers() {
+export default function InfoHandlers() {
 
     const [profile, setProfile] = useState(null);
     const [games, setGames] = useState([]);
