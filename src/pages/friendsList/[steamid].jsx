@@ -2,10 +2,10 @@ export default function FriendsList() {
 
     return (
         <main>
-            {/* botão para voltar atrás */}
+            {/* Botão para voltar atrás */}
             <div>
                 <button>
-                    
+
                 </button>
             </div>
             <div>
