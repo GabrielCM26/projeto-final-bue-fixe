@@ -31,6 +31,50 @@ async function getAccountInfo(steamid) {
   return accountDetails;
 }
 
+
+async function leaderboardNeverPlayed(){
+  const topPlayers = await Game.aggregate([
+    { $match: {playtime_forever: 0} },
+    {
+      $group: {
+        _id: "$steamid",
+        gamesNeverPlayed: { $sum: 1 },
+      },
+    },
+    { $limit: 10 },
+    { $sort: { gamesNeverPlayed: -1 } },
+  ]);
+  return topPlayers;
+}
+
+async function leaderboardMoneyWasted(){
+  const topPlayers = await Game.aggregate([
+    { $match: { playtime_forever: 0 } },
+    { $group: {
+        _id: "$steamid",
+        priceSum: { $sum: "$price" },
+      },
+    },
+    { $limit: 10 },
+    { $sort: { priceSum: -1 } },
+  ]);
+  return topPlayers;
+}
+
+
+async function getAchievementsCompleted(steamid) {
+  const userGames = await Game.find({ steamid });
+  let totalAchievements = 0;
+  let completedAchievements = 0;
+  userGames.forEach((game) => {
+    if (game.achievements && Array.isArray(game.achievements)) {
+      totalAchievements += game.achievements.length;
+      completedAchievements += game.achievements.filter((a) => a.achieved).length;
+    }
+  });
+  return { totalAchievements, completedAchievements };
+}
+
 // const allGenreTimes = gamesWithGenres.reduce((acc, game) => {
 //   game.genres.forEach(genre => {
 //     const genreName = genre.description;
@@ -73,7 +117,7 @@ async function top10Achievements(steamid) {
 //   const gamesplated = friendsgames
 // }
 
-module.exports = { getAccountInfo, getGenrePlaytime };
+module.exports = { getAccountInfo, getGenrePlaytime, top10Achievements, leaderboardNeverPlayed, leaderboardMoneyWasted, getAchievementsCompleted };
 // função de teste
 (async () => {
   await connectDB();
