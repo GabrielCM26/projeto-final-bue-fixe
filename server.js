@@ -95,23 +95,23 @@ app.post("/api/games", async (req, res) => {
   try {
     const ownedGames = await getOwnedGames(profileID);
     const friendsSteamIDs = await getfriendIDs(profileID);
-    const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
-    const uniqueGames = await findCommonGames(allSteamIDs);
-    await preloadGameSchemas(uniqueGames);
+    // const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
+    // const uniqueGames = await findCommonGames(allSteamIDs);
+    await preloadGameSchemas(ownedGames);
     // console.log("OwnedGames:", ownedGames);
     // console.log("FriendsSteamIDs:", friendsSteamIDs);
-    console.log("UniqueGames for schema preload:", uniqueGames);
+    // console.log("UniqueGames for schema preload:", uniqueGames);
 
     const limit = pRateLimit({
       interval: 1000,
-      rate: 5,
+      rate: 50,
       concurrency: 1,
     });
 
     const friendLimits = pRateLimit({
       interval: 1000,
-      rate: 200,
-      concurrency: 20,
+      rate: 100,
+      concurrency: 10,
     });
     const friendGamesWithAchievements = await Promise.all(
       friendsSteamIDs.friendIDs.map(async (friend) => {
@@ -127,17 +127,17 @@ app.post("/api/games", async (req, res) => {
               price = await limit(() => getLowestGamePrice(game.appid));
               price = price ? price : 0;
             }
-            const achievements = await friendLimits(() =>
-              checkAchievements(friend, game.appid)
-            );
-            const mappedAchievements = (achievements || []).map((a) => ({
-              apiname: a.apiname,
-              achieved: !!a.achieved,
-              unlocktime: a.unlocktime,
-              globalAchievementPercentage: a.globalPercentage,
-              icon: a.icon,
-              icongray: a.icongray,
-            }));
+            // const achievements = await friendLimits(() =>
+            //   checkAchievements(friend, game.appid)
+            // );
+            // const mappedAchievements = (achievements || []).map((a) => ({
+            //   apiname: a.apiname,
+            //   achieved: !!a.achieved,
+            //   unlocktime: a.unlocktime,
+            //   globalAchievementPercentage: a.globalPercentage,
+            //   icon: a.icon,
+            //   icongray: a.icongray,
+            // }));
 
             return {
               steamid: friend,
@@ -145,7 +145,7 @@ app.post("/api/games", async (req, res) => {
               name: game.name,
               img_icon_url: game.img_icon_url,
               playtime_forever: game.playtime_forever,
-              achievements: mappedAchievements,
+              // achievements: mappedAchievements,
               price: price,
             };
           })
