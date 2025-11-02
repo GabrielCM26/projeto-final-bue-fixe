@@ -8,6 +8,7 @@ const gameSchema = new mongoose.Schema({
   appid: { type: Number },
   name: { type: String},
   img_icon_url: { type: String },
+  poster: { type: String },
   playtime_forever: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],

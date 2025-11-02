@@ -3,6 +3,7 @@ require("dotenv").config({
 });
 const Game = require("../models/game");
 const connectDB = require("../../lib/mongodb");
+const achievements = require("../models/achievements");
 
 async function getAccountInfo(steamid) {
   const userGames = await Game.find({ steamid });
@@ -31,24 +32,62 @@ async function getAccountInfo(steamid) {
 }
 
 
-//   const allGenreTimes = gamesWithGenres.reduce((acc, game) => {
-//     game.genres.forEach(genre => {
-//       const genreName = genre.description;
-//       const timePlayed = game.playtime_forever || 0;
-//       acc[genreName] = (acc[genreName] || 0) + timePlayed;
-//     });
-//     return acc;
-//   }, {});
-//   const sortedGenres = Object.entries(allGenreTimes)
-//     .map(([genre, timePlayed]) => ({ genre, timePlayed }))
-//     .sort((a, b) => b.timePlayed - a.timePlayed);
-    
-//   return sortedGenres;
-// }
+async function leaderboardNeverPlayed(){
+  const topPlayers = await Game.aggregate([
+    { $match: {playtime_forever: 0} },
+    {
+      $group: {
+        _id: "$steamid",
+        gamesNeverPlayed: { $sum: 1 },
+      },
+    },
+    { $limit: 10 },
+    { $sort: { gamesNeverPlayed: -1 } },
+  ]);
+  return topPlayers;
+}
+
+async function leaderboardMoneyWasted(){
+  const topPlayers = await Game.aggregate([
+    { $match: { playtime_forever: 0 } },
+    { $group: {
+        _id: "$steamid",
+        priceSum: { $sum: "$price" },
+      },
+    },
+    { $limit: 10 },
+    { $sort: { priceSum: -1 } },
+  ]);
+  return topPlayers;
+}
 
 
+async function getAchievementsCompleted(steamid) {
+  const userGames = await Game.find({ steamid });
+  let totalAchievements = 0;
+  let completedAchievements = 0;
+  userGames.forEach((game) => {
+    if (game.achievements && Array.isArray(game.achievements)) {
+      totalAchievements += game.achievements.length;
+      completedAchievements += game.achievements.filter((a) => a.achieved).length;
+    }
+  });
+  return { totalAchievements, completedAchievements };
+}
 
+// const allGenreTimes = gamesWithGenres.reduce((acc, game) => {
+//   game.genres.forEach(genre => {
+//     const genreName = genre.description;
+//     const timePlayed = game.playtime_forever || 0;
+//     acc[genreName] = (acc[genreName] || 0) + timePlayed;
+//   });
+//   return acc;
+// }, {});
+// const sortedGenres = Object.entries(allGenreTimes)
+//   .map(([genre, timePlayed]) => ({ genre, timePlayed }))
+//   .sort((a, b) => b.timePlayed - a.timePlayed);
 
+// return sortedGenres;
 
 console.log(getAccountInfo("76561198006409530"));
 
@@ -61,7 +100,24 @@ async function getGenrePlaytime(games) {
   }, {});
 }
 
-module.exports = { getAccountInfo, getGenrePlaytime };
+async function top10Achievements(steamid) {
+  const userGames = await Game.find({ steamid });
+  const topAchievements = userGames.achievements.sort((a, b) => b.unlocktime - a.unlocktime).slice(0, 10);
+  return topAchievements
+}
+
+
+// trying for a rank friends by number of platinumed games
+// async function friendsbyplat(steamid) {
+//   const userProfile = await profile.find({ steamid });
+//   const friends = userProfile.friends;
+//   const friendsGames = friends.map(async (friendProfile) => {
+//           return await Profile.find(
+//             { steamid: friendProfile.steamid },
+//   const gamesplated = friendsgames
+// }
+
+module.exports = { getAccountInfo, getGenrePlaytime, top10Achievements, leaderboardNeverPlayed, leaderboardMoneyWasted, getAchievementsCompleted };
 // função de teste
 (async () => {
   await connectDB();
