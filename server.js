@@ -97,7 +97,7 @@ app.post("/api/games", async (req, res) => {
     const friendsSteamIDs = await getfriendIDs(profileID);
     // const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
     // const uniqueGames = await findCommonGames(allSteamIDs);
-    await preloadGameSchemas(ownedGames);
+    // await preloadGameSchemas(ownedGames);
     // console.log("OwnedGames:", ownedGames);
     // console.log("FriendsSteamIDs:", friendsSteamIDs);
     // console.log("UniqueGames for schema preload:", uniqueGames);
@@ -105,7 +105,7 @@ app.post("/api/games", async (req, res) => {
     const limit = pRateLimit({
       interval: 1000,
       rate: 50,
-      concurrency: 1,
+      concurrency: 5,
     });
 
     const friendLimits = pRateLimit({
