@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function Dashboard() {
+export default function infohandlers() {
 
     const [profile, setProfile] = useState(null);
     const [games, setGames] = useState([]);
@@ -24,15 +24,6 @@ export default function Dashboard() {
                 setGames(dataGames);
                 console.log("GAMES DATA", dataGames);
 
-                // totalHours min
-                const totalMinutes = dataGames.reduce((acc, game) => {
-                    return acc + (game.playtime_forever || 0);
-                }, 0);
-
-                // totalHours h
-                const hours = Math.round(totalMinutes / 60);
-                setTotalHours(hours);
-
             } catch (error) {
                 console.error("Failed to load profile/games:", error);
             }
@@ -41,7 +32,7 @@ export default function Dashboard() {
         loadData();
     }, [steamid]);
 
-    export default function UserProfile() {
+    function UserProfile() {
         return (
             <div>
                 <div>
