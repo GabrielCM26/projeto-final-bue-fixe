@@ -122,11 +122,11 @@ app.post("/api/games", async (req, res) => {
         // console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
-            // let price = 0;
-            // if (game.playtime_forever === 0) {
-            //   price = await limit(() => getLowestGamePrice(game.appid));
-            //   price = price ? price : 0;
-            // }
+            let price = 0;
+            if (game.playtime_forever === 0) {
+              price = await limit(() => getLowestGamePrice(game.appid));
+              price = price ? price : 0;
+            }
             const achievements = await friendLimits(() =>
               checkAchievements(friend, game.appid)
             );
@@ -146,7 +146,7 @@ app.post("/api/games", async (req, res) => {
               img_icon_url: game.img_icon_url,
               playtime_forever: game.playtime_forever,
               achievements: mappedAchievements,
-              // price: price,
+              price: price,
             };
           })
         );
