@@ -73,7 +73,7 @@ app.post("/api/profiles", async (req, res) => {
       })
     );
 
-    userProfile.friends = friendDocs.map((doc) => doc._id);
+    userProfile.friends = friendDocs.map((doc) => doc.steamid);
 
     const profile = await Profile.findOneAndUpdate(
       { steamid: profileID },
