@@ -102,6 +102,12 @@ app.post("/api/games", async (req, res) => {
     // console.log("FriendsSteamIDs:", friendsSteamIDs);
     console.log("UniqueGames for schema preload:", uniqueGames);
 
+    const limit = pRateLimit({
+      interval: 1000,
+      rate: 5,
+      concurrency: 1,
+    });
+
     const friendLimits = pRateLimit({
       interval: 1000,
       rate: 200,
@@ -113,7 +119,7 @@ app.post("/api/games", async (req, res) => {
         if (friendGames.length === 0) {
           return [];
         }
-        console.log("friendGames:", friendGames);
+        // console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
             // let price = 0;
@@ -160,11 +166,6 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
-    const limit = pRateLimit({
-      interval: 1000,
-      rate: 5,
-      concurrency: 1,
-    });
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
         const genres = await getGameGenres(game.appid);
