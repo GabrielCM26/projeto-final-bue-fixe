@@ -22,7 +22,7 @@ const {
 } = require("./lib/steamapi");
 const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
-const { pRateLimit } = require('p-ratelimit');
+const { pRateLimit } = require("p-ratelimit");
 
 // ===== ENDPOINTS DA API =====
 
@@ -67,13 +67,13 @@ app.post("/api/profiles", async (req, res) => {
       friendsProfiles.map(async (friendProfile) => {
         return await Profile.findOneAndUpdate(
           { steamid: friendProfile.steamid },
-          friendProfile,
+          { $set: friendProfile },
           { new: true, upsert: true }
         );
       })
     );
 
-    userProfile.friends = friendDocs.map((doc) => doc.steamid);
+    userProfile.friends = friendDocs.map((doc) => doc._id);
 
     const profile = await Profile.findOneAndUpdate(
       { steamid: profileID },
@@ -86,9 +86,6 @@ app.post("/api/profiles", async (req, res) => {
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
-
-
-
 
 app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
@@ -113,12 +110,16 @@ app.post("/api/games", async (req, res) => {
         console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
-            const achievements = await friendLimits(() => checkAchievements(friend, game.appid));
+            const achievements = await friendLimits(() =>
+              checkAchievements(friend, game.appid)
+            );
             const mappedAchievements = (achievements || []).map((a) => ({
               apiname: a.apiname,
               achieved: !!a.achieved,
               unlocktime: a.unlocktime,
               globalAchievementPercentage: a.globalPercentage,
+              icon: a.icon,
+              icongray: a.icongray,
             }));
 
             return {
@@ -136,7 +137,6 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
-
     const flattenedFriendGames = friendGamesWithAchievements.flat();
     const friendGames = await Promise.all(
       flattenedFriendGames.map(async (game) => {
@@ -148,16 +148,15 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
-
     const limit = pRateLimit({
       interval: 1000,
       rate: 5,
-      concurrency: 1
+      concurrency: 1,
     });
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
         const genres = await getGameGenres(game.appid);
-        let price = 0
+        let price = 0;
         if (game.playtime_forever === 0) {
           price = await limit(() => getLowestGamePrice(game.appid));
           price = price ? price : 0;
@@ -176,6 +175,8 @@ app.post("/api/games", async (req, res) => {
           achieved: !!a.achieved,
           unlocktime: a.unlocktime,
           globalAchievementPercentage: a.globalPercentage,
+          icon: a.icon,
+          icongray: a.icongray,
         }));
 
         return {
@@ -186,7 +187,7 @@ app.post("/api/games", async (req, res) => {
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: mappedGenres,
-          price: price
+          price: price,
         };
       })
     );
