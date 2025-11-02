@@ -20,9 +20,9 @@ const {
   getGameGenres,
   getLowestGamePrice,
 } = require("./lib/steamapi");
-const {getWithBackoff} = require("./src/utils/dataProcessing");
+const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
-const { pRateLimit } = require('p-ratelimit');
+const { pRateLimit } = require("p-ratelimit");
 
 // ===== ENDPOINTS DA API =====
 
@@ -87,9 +87,6 @@ app.post("/api/profiles", async (req, res) => {
   }
 });
 
-
-
-
 app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
 
@@ -113,12 +110,16 @@ app.post("/api/games", async (req, res) => {
         console.log("friendGames:", friendGames);
         const gamesWithAchievements = await Promise.all(
           friendGames.map(async (game) => {
-            const achievements = await friendLimits(() => checkAchievements(friend, game.appid));
+            const achievements = await friendLimits(() =>
+              checkAchievements(friend, game.appid)
+            );
             const mappedAchievements = (achievements || []).map((a) => ({
               apiname: a.apiname,
               achieved: !!a.achieved,
               unlocktime: a.unlocktime,
               globalAchievementPercentage: a.globalPercentage,
+              icon: a.icon,
+              icongray: a.icongray,
             }));
 
             return {
@@ -136,7 +137,6 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
-
     const flattenedFriendGames = friendGamesWithAchievements.flat();
     const friendGames = await Promise.all(
       flattenedFriendGames.map(async (game) => {
@@ -148,25 +148,24 @@ app.post("/api/games", async (req, res) => {
       })
     );
 
+    const limit = pRateLimit({
+      interval: 1000,
+      rate: 5,
+      concurrency: 1,
+    });
+    const gamesWithAchievements = await Promise.all(
+      ownedGames.map(async (game) => {
+        const genres = await getGameGenres(game.appid);
+        let price = 0;
+        if (game.playtime_forever === 0) {
+          price = await limit(() => getLowestGamePrice(game.appid));
+          price = price ? price : 0;
+        }
 
-  const limit = pRateLimit({
-    interval: 1000,
-    rate: 5,
-    concurrency: 1
-  });
-  const gamesWithAchievements = await Promise.all(
-    ownedGames.map(async (game) => {
-      const genres = await getGameGenres(game.appid);
-      let price = 0
-      if (game.playtime_forever === 0) {
-         price = await limit(() => getLowestGamePrice(game.appid));
-        price = price ? price  : 0;
-      }
-
-      const achievements = await checkAchievements(profileID, game.appid);
-      //  console.log(achievements);
-      // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
-      const mappedGenres = genres.map((g) => ({
+        const achievements = await checkAchievements(profileID, game.appid);
+        //  console.log(achievements);
+        // console.log("Game:", game.name, "Genres:", genres, "Price:", price);
+        const mappedGenres = genres.map((g) => ({
           id: g.id,
           description: g.description,
         }));
@@ -176,6 +175,8 @@ app.post("/api/games", async (req, res) => {
           achieved: !!a.achieved,
           unlocktime: a.unlocktime,
           globalAchievementPercentage: a.globalPercentage,
+          icon: a.icon,
+          icongray: a.icongray,
         }));
 
         return {
@@ -186,7 +187,7 @@ app.post("/api/games", async (req, res) => {
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: mappedGenres,
-          price: price 
+          price: price,
         };
       })
     );

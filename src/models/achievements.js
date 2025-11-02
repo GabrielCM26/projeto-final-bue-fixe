@@ -6,6 +6,7 @@ const achievementSchema = new mongoose.Schema({
   globalAchievementPercentage: { type: String },
   unlocktime: { type: Date },
   icon: { type: String },
+  icongray: { type: String },
 });
 
 module.exports =
