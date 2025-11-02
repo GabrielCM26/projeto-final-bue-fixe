@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+﻿import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
@@ -53,7 +53,7 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="min-h-screen text-white flex justify-center p-4">
+    <main className="min-h-screen text-white flex justify-center p-9">
       <section className="w-full max-w-xs bg-[#1a1c20] rounded-2xl p-4 flex flex-col gap-6 shadow-xl">
 
         {/* HEADER */}
