@@ -1,54 +1,106 @@
-export default function UserProfile() {
-    return (
-        <div>
-            <div>
+import { useState, useEffect } from "react";
 
-                {/* Foto de perfil */}
-                <img />
+export default function Dashboard() {
+
+    const [profile, setProfile] = useState(null);
+    const [games, setGames] = useState([]);
+    const [totalHours, setTotalHours] = useState(0);
+
+    useEffect(() => {
+        if (!steamid) return;
+
+        async function loadData() {
+            try {
+
+                // PERFIL
+                const resProfile = await fetch(`/api/profiles/${steamid}`);
+                const dataProfile = await resProfile.json();
+                setProfile(dataProfile);
+                console.log("PROFILE DATA", dataProfile);
+
+                // Games  
+                const resGames = await fetch(`/api/games/${steamid}`);
+                const dataGames = await resGames.json();
+                setGames(dataGames);
+                console.log("GAMES DATA", dataGames);
+
+                // totalHours min
+                const totalMinutes = dataGames.reduce((acc, game) => {
+                    return acc + (game.playtime_forever || 0);
+                }, 0);
+
+                // totalHours h
+                const hours = Math.round(totalMinutes / 60);
+                setTotalHours(hours);
+
+            } catch (error) {
+                console.error("Failed to load profile/games:", error);
+            }
+        }
+
+        loadData();
+    }, [steamid]);
+
+    export default function UserProfile() {
+        return (
+            <div>
                 <div>
 
-                    {/* Nome de Utilizador */}
-                    <h1>
-                        Steam Username
-                    </h1>
+                    {/* Foto de perfil */}
+                    <img
+                        src={profile.avatar}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                    />
                     <div>
 
-                        {/* "Roles" com Genres */}
-                        <ul>
-                            <li>Rhythm Game</li>
-                        </ul>
+                        {/* Nome de Utilizador */}
+                        <h1>
+                            <div className="text-sm text-gray-200 truncate max-w-[6rem]">
+                                {profile?.personaname || "user"}
+                            </div>
+                        </h1>
+                        <div>
+
+                            {/* "Roles" com Genres */}
+                            <ul>
+                                <li>Rhythm Game</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+                {/* Div que demonstra as 10 achievements mais recentes (opcional); leva depois à página dos achievements todos */}
+                <div>
+                    <h3>My most recent achievements</h3>
+                    <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                            <div
+                                key={i}
+                                className="flex-1 bg-[#2a2c33] rounded-md p-4 flex items-center justify-center"
+                            >
+                                <img
+                                    src="game.chievements.icon"
+                                    alt={`Trophy ${i}`}
+                                    className="w-8 h-8 object-contain opacity-80"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <a>view all...</a>
+                </div>
 
-            {/* Biografia do Usuário; opcional */}
-            <div>
-                <p>Hi! Test 1 2 3</p>
-            </div>
-
-            {/* Div que demonstra as 10 achievements mais recentes (opcional); leva depois à página dos achievements todos */}
-            <div>
-                <h3>My most recent achievements</h3>
-                <ul>
-                    <li>1</li>
-                    <li>2</li>
-                    <li>3</li>
-                </ul>
-                <a>view all...</a>
-            </div>
-
-            {/* Fake div que leva à página dos amigos */}
-            <button>
-                <p>I have (X) friends!</p>
-            </button>
-
-            {/* Div com botão e flavor text */}
-            <div>
-                <p>Who has the most games platinumed? Click here to check!</p>
+                {/* Fake div que leva à página dos amigos */}
                 <button>
-                    <p>Leaderboard</p>
+                    <p>I have (X) friends!</p>
                 </button>
+
+                {/* Div com botão e flavor text */}
+                <div>
+                    <p>Who has the most games platinumed? Click here to check!</p>
+                    <button>
+                        <p>Leaderboard</p>
+                    </button>
+                </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
