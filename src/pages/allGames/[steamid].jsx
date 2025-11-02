@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import GameCard from '@/components/GameCard';
+import { SortAsc, SortDesc } from 'lucide-react';
+
 
 export default function AllGames() {
     const router = useRouter();
@@ -12,6 +14,7 @@ export default function AllGames() {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('name');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     useEffect(() => {
         if (!steamid) return;
@@ -47,24 +50,35 @@ export default function AllGames() {
         );
     }
 
+    const SortIcon = sortOrder === 'asc' ? SortAsc : SortDesc;
+    const toggleSortOrder = () => {
+        setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    };
+
     const filteredGames = games.filter(game =>
         game.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const sortedGames = [...filteredGames].sort((a, b) => {
+        let result;
         switch (sortBy) {
             case 'name':
-                return a.name.localeCompare(b.name);
+                result = a.name.localeCompare(b.name);
+                break;
             case 'playtime':
-                return b.playtime_forever - a.playtime_forever;
+                result = b.playtime_forever - a.playtime_forever;
+                break;
             case 'achievements':
                 const aAchieved = a.achievements ? a.achievements.filter(ach => ach.achieved).length : 0;
                 const bAchieved = b.achievements ? b.achievements.filter(ach => ach.achieved).length : 0;
-                return bAchieved - aAchieved;
+                result = bAchieved - aAchieved;
+                break;
             default:
-                return 0;
+                result = 0;
         }
+        return sortOrder === 'asc' ? -result : result;
     });
+
 
     return (
         <div className="min-h-screen bg-gray-600">
@@ -82,20 +96,31 @@ export default function AllGames() {
                                 placeholder="Search games..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-3 py-1 text-xs bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                                className="w-full px-3 py-2 text-xs bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                             />
                         </div>
                         {/* Sort Dropdown */}
-                        <div className="flex-shrink-0 w-28">
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full px-3 py-1 text-xs bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                            >
-                                <option value="name">Sort by Name</option>
-                                <option value="playtime">Sort by Playtime</option>
-                                <option value="achievements">Sort by Achievements</option>
-                            </select>
+                        <div className="flex flex-row items-center gap-2">
+                            {/* Dropdown */}
+                            <div className="flex flex-row items-center gap-2">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-gray-900 border border-gray-700 rounded-lg py-2 px-3 text-xs text-white focus:outline-none focus:border-steam-light"
+                                >
+                                    <option value="name">Name (A-Z)</option>
+                                    <option value="playtime">Playtime</option>
+                                    <option value="achievements">Achievements</option>
+                                </select>
+                                {/* Sorting button*/}
+                                <button
+                                    onClick={toggleSortOrder}
+                                    className="p-1 bg-gray-800 border border-gray-600 rounded-lg text-xs text-white font-semibold transition hover:text-steam-light"
+                                    aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+                                >
+                                    <SortIcon className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
