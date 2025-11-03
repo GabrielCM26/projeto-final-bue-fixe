@@ -9,6 +9,7 @@ const gameSchema = new mongoose.Schema({
   name: { type: String},
   img_icon_url: { type: String },
   poster: { type: String },
+  steamURL: { type: String },
   playtime_forever: { type: Number },
   price: { type: Number },
   achievements: [Achievement.schema],

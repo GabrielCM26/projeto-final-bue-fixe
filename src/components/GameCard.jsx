@@ -3,7 +3,7 @@ import { Trophy, Clock } from 'lucide-react';
 
 const GameCard = ({ game }) => {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const threshold = 12;
+  const threshold = 30;
 
   const handleMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -15,6 +15,8 @@ const GameCard = ({ game }) => {
   const handleLeave = () => {
     setTilt({ x: 0, y: 0 });
   };
+
+
 
   // Format playtime hours
   const formatPlaytime = (minutes) => {
@@ -29,7 +31,7 @@ const GameCard = ({ game }) => {
 
   return (
     <div
-      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px] bg-gray-900 relative"
+      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px]  bg-gray-900 inset-shadow-sm inset-shadow-emerald-800 relative h-56 hover:scale-125 hover:z-2"
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
       style={{

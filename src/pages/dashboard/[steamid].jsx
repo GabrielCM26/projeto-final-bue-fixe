@@ -1,12 +1,14 @@
 ﻿import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import CardDashboard from "../../components/CardDasboard.jsx";
+import Loader from '@/components/Loader';
 
 export default function Dashboard() {
   const router = useRouter();
   const { steamid } = router.query;
 
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [bestGame, setBestGame] = useState(null);
@@ -15,6 +17,7 @@ export default function Dashboard() {
     if (!steamid) return;
 
     async function loadData() {
+      setLoading(true);
       try {
         // PERFIL
         const resProfile = await fetch(`/api/profiles/${steamid}`);
@@ -22,10 +25,10 @@ export default function Dashboard() {
 
         const normalizedProfile = dataProfile.userProfile
           ? {
-              ...dataProfile.userProfile,
-              friends: dataProfile.friendsProfiles || [],
-              steamLevel: dataProfile.steamLevel ?? null,
-            }
+            ...dataProfile.userProfile,
+            friends: dataProfile.friendsProfiles || [],
+            steamLevel: dataProfile.steamLevel ?? null,
+          }
           : dataProfile;
 
         setProfile(normalizedProfile);
@@ -44,7 +47,6 @@ export default function Dashboard() {
 
         // BEST GAME (mais jogado)
         if (dataGames.length > 0) {
-          // pega o jogo com mais playtime
           const mostPlayed = [...dataGames].sort(
             (a, b) =>
               (b.playtime_forever || 0) - (a.playtime_forever || 0)
@@ -72,10 +74,10 @@ export default function Dashboard() {
             }
           }
 
-          
+
           const coverUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${mostPlayed.appid}/library_600x900.jpg`;
 
-       
+
           const achievementsDone = mostPlayed.achievementsDone || 0;
           const achievementsTotal = mostPlayed.achievementsTotal || 0;
 
@@ -83,7 +85,7 @@ export default function Dashboard() {
             appid: mostPlayed.appid,
             name: mostPlayed.name,
             developer: mostPlayed.developer || "",
-            quote: "", // podes meter mais tarde
+            quote: "",
             cover: coverUrl,
             hoursPlayed,
             achievementsDone,
@@ -95,6 +97,8 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error("Failed to load profile/games:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -102,10 +106,10 @@ export default function Dashboard() {
   }, [steamid]);
 
   // LOADING STATE
-  if (!profile) {
+  if (loading) {
     return (
       <main className="min-h-screen text-white flex justify-center items-center p-4 bg-[#121212]">
-        <div className="text-gray-500 text-sm">Loading...</div>
+         <Loader />
       </main>
     );
   }
@@ -133,7 +137,7 @@ export default function Dashboard() {
       >
         {/* HEADER */}
         <header className="grid grid-cols-3 items-center">
-          {/* Empty div for spacing */}
+
           <div></div>
 
           {/* Logo */}
@@ -145,7 +149,7 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* User mini-profile (nome + avatar) */}
+
           <div className="flex items-center gap-2 justify-end">
             <div className="text-sm text-gray-200 truncate max-w-24">
               {profile?.personaname || "user"}
@@ -173,7 +177,7 @@ export default function Dashboard() {
 
         {/* RESTO DO DASHBOARD */}
         <div className="flex flex-col gap-7">
-          
+
           <div className="flex flex-col sm:flex-row gap-2 text-center">
             {/* HOURS PLAYED */}
             <div className="flex-1 bg-[#282828] rounded-md p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
@@ -222,7 +226,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-        
+
 
           {/* BEST ACHIEVEMENTS */}
           <div className="bg-[#282828] rounded-md p-3 flex flex-col gap-4 transition-all duration-300 hover:shadow-lg">
