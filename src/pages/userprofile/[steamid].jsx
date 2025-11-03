@@ -108,7 +108,7 @@ export default function UserProfile() {
           <div
             className={` bg-neutral-800 justify-start p-2 pl-4 text-xl ${aksharFont.className} rounded-[10px] mb-5`}
           >
-            <a href="/friendsList/[steamid]" className="flex flex-row">
+            <a href={`/friendsList/${steamid}`} className="flex flex-row">
               <p>
                 I have{" "}
                 <span className="text-[#58CE87] font-bold">
