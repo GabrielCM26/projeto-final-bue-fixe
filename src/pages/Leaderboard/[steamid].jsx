@@ -63,7 +63,7 @@ export default function Leaderboard() {
                                 personaname: profileData.personaname || "Unknown User",
                                 avatar: profileData.avatar || "/default-avatar.png",
                                 moneyWasted: moneyWasted / 100, // Convert from cents to euros
-                                isCurrentUser: steamid === steamid,
+                                isCurrentUser: steamid === router.query.steamid,
                                 hasGameData: true
                             };
                         } catch (error) {
