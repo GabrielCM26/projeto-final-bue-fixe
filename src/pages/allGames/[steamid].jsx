@@ -87,7 +87,7 @@ export default function AllGames() {
     return (
         <main className="min-h-screen text-white flex justify-center items-center p-4">
             {/* Header */}
-            <section className="w-full max-w-[440px] md:max-w-[75%] bg-linear-to-t from-[#aae4c1] from-50% to-[#000d12] rounded-2xl p-4 flex flex-col gap-6 shadow-xl">
+            <section className="w-full max-w-[440px] md:max-w-[75%] bg-linear-to-t from-[#000d12] from-88% to-[#001334] rounded-2xl p-4 flex flex-col gap-6 shadow-xl">
                 <header className="flex justify-between items-start">
                     <div className="flex items-center gap-4">
                         <img

@@ -5,23 +5,31 @@ export default function Navbar() {
   const router = useRouter();
   const path = router.asPath;
 
-  // páginas onde NÃO queremos navbar (ex: login)
   const hideOn = ["/", "/testLogin"];
   if (hideOn.includes(path)) {
     return null;
   }
 
-  // tenta extrair steamid (tipo 7656119...)
   const match = path.match(/\/(\d{17,})/);
   const steamid = match ? match[1] : null;
 
+  const ROUTES = {
+    home: "dashboard",
+    games: "allGames",
+    friends: "friendsList",
+    user: "userprofile",
+  };
+
   const [active, setActive] = useState("home");
 
+  
   useEffect(() => {
-    if (path.startsWith("/dashboard")) setActive("home");
-    else if (path.startsWith("/allGames")) setActive("games");
-    else if (path.startsWith("/friendsList")) setActive("friends");
-    else if (path.startsWith("/userprofile")) setActive("user");
+    for (const [key, route] of Object.entries(ROUTES)) {
+      if (path.startsWith(`/${route}`)) {
+        setActive(key);
+        return;
+      }
+    }
   }, [path]);
 
   const go = (tab, href) => {
@@ -48,68 +56,62 @@ export default function Navbar() {
         { key: "games", label: "Games", icon: <IconGames /> },
         { key: "friends", label: "Friends", icon: <IconFriends /> },
         { key: "user", label: "Profile", icon: <IconUser /> },
-      ].map((item) => (
-        <button
-          key={item.key}
-          onClick={() =>
-            go(
-              item.key,
-              steamid
-                ? `/${item.key === "home" ? "dashboard" : item.key}/${steamid}`
-                : "/"
-            )
-          }
-          className={`
-            relative flex flex-col items-center
-            text-[10px] font-medium leading-none
-            transition-all
-            px-2 py-1
-            ${
-              active === item.key
-                ? "text-[#aae4c1]"
-                : "text-gray-400 hover:text-[#aae4c1]"
-            }
-          `}
-        >
-          {/* ícone + glow */}
-          <div className="relative flex items-center justify-center">
-            {item.icon}
+      ].map((item) => {
+        const base = ROUTES[item.key];
+        const href = steamid ? `/${base}/${steamid}` : "/";
+
+        return (
+          <button
+            key={item.key}
+            onClick={() => go(item.key, href)}
+            className={`
+              relative flex flex-col items-center
+              text-[10px] font-medium leading-none
+              transition-all
+              px-2 py-1
+              ${
+                active === item.key
+                  ? "text-[#aae4c1]"
+                  : "text-gray-400 hover:text-[#aae4c1]"
+              }
+            `}
+          >
+            
+            <div className="relative flex items-center justify-center">
+              {item.icon}
+              {active === item.key && (
+                <div
+                  className="
+                    absolute inset-0
+                    blur-lg
+                    rounded-full
+                    opacity-20
+                    pointer-events-none
+                  "
+                  style={{ backgroundColor: "#aae4c1" }}
+                />
+              )}
+            </div>
+
+            <span className="mt-1">{item.label}</span>
 
             {active === item.key && (
               <div
                 className="
-                  absolute inset-0
-                  blur-lg
-                  rounded-full
-                  opacity-20
-                  pointer-events-none
+                  absolute -bottom-2 left-1/2 -translate-x-1/2
+                  h-[2px] w-6 rounded-full
+                  shadow-[0_0_8px_rgba(170,228,193,0.7)]
                 "
                 style={{ backgroundColor: "#aae4c1" }}
               />
             )}
-          </div>
-
-          {/* label */}
-          <span className="mt-1">{item.label}</span>
-
-          {/* aro verde subtil por baixo da tab ativa */}
-          {active === item.key && (
-            <div
-              className="
-                absolute -bottom-2 left-1/2 -translate-x-1/2
-                h-[2px] w-6 rounded-full
-                shadow-[0_0_8px_rgba(170,228,193,0.7)]
-              "
-              style={{ backgroundColor: "#aae4c1" }}
-            />
-          )}
-        </button>
-      ))}
+          </button>
+        );
+      })}
     </nav>
   );
 }
 
-/* Ícones */
 function IconHome() {
   return (
     <svg
@@ -157,3 +159,4 @@ function IconUser() {
     </svg>
   );
 }
+
