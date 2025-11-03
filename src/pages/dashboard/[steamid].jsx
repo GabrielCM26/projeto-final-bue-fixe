@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+﻿import { useRouter } from "next/router";
 import { useState, useEffect, useMemo } from "react";
 import CardDashboard from "../../components/CardDasboard.jsx";
 
@@ -20,7 +20,7 @@ export default function Dashboard() {
     try {
       return amount.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
     } catch (e) {
-      return `€${amount.toFixed(2)}`;
+      return `â‚¬${amount.toFixed(2)}`;
     }
   };
 
@@ -48,7 +48,7 @@ export default function Dashboard() {
         const dataGames = await resGames.json();
         setGames(dataGames);
 
-        // Total horas jogadas (somatório em minutos -> horas arredondadas)
+        // Total horas jogadas (somatÃ³rio em minutos -> horas arredondadas)
         const totalMinutes = dataGames.reduce(
           (acc, game) => acc + (game.playtime_forever || 0),
           0
@@ -78,7 +78,7 @@ export default function Dashboard() {
             } else if (diffDays === 1) {
               lastPlayedLabel = "Ontem";
             } else {
-              lastPlayedLabel = `${diffDays} dias atrás`;
+              lastPlayedLabel = `${diffDays} dias atrÃ¡s`;
             }
           }
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
     };
   }, [profile]);
 
-  // Total de money wasted do utilizador (soma dos preços)
+  // Total de money wasted do utilizador (soma dos preÃ§os)
   const userMoneyWasted = useMemo(() => {
     if (!games || games.length === 0) return 0;
     return games.reduce((sum, g) => sum + (g.price || 0), 0);
@@ -231,6 +231,12 @@ export default function Dashboard() {
               <div className="text-[10px] text-gray-400 uppercase tracking-wide">Hours played</div>
             </div>
 
+            {/* MONEY WASTED (total) */}
+            <div className="flex-1 bg-[#282828] rounded-md p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
+              <div className="text-white font-semibold text-lg">{formatCurrency(userMoneyWasted)}</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide">Money wasted</div>
+            </div>
+
             {/* GAMES OWNED */}
             <div className="flex-1 bg-[#282828] rounded-md p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
               <div className="text-white font-semibold text-lg">{games.length}</div>
@@ -238,24 +244,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Money Wasted total (sem imagens) */}
-          <div className="bg-[#1a1a1a] rounded-md p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-white">Money Wasted</span>
-              <span className="text-sm font-semibold text-red-400">{formatCurrency(userMoneyWasted)}</span>
-            </div>
-          </div>
-
           {/* Friends' Money Wasted */}
           <div className="bg-[#1a1a1a] rounded-md p-3">
-            <div className="text-sm font-semibold text-white mb-2">Money Wasted dos Amigos</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-semibold text-white">Money Wasted dos Amigos</div>
+              <a href={`/Leaderboard/${steamid}`} className="text-[10px] text-gray-400 hover:text-[#aae4c1]">See all</a>
+            </div>
             {loadingFriendsMoney ? (
               <div className="text-xs text-gray-400">A carregar...</div>
             ) : friendsMoney.length === 0 ? (
               <div className="text-xs text-gray-400">Sem dados dos amigos.</div>
             ) : (
-              <ul className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
-                {friendsMoney.slice(0, 10).map((f, idx) => (
+              <ul className="flex flex-col gap-2">
+                {friendsMoney.slice(0, 5).map((f, idx) => (
                   <li key={f.steamid} className="flex items-center gap-2 bg-[#282828] rounded-md p-2">
                     <div className="text-xs text-gray-400 w-5 text-center">{idx + 1}</div>
                     <a
@@ -290,4 +291,3 @@ export default function Dashboard() {
     </main>
   );
 }
-
