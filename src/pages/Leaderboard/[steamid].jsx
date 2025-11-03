@@ -29,23 +29,23 @@ export default function Leaderboard() {
                 
                 // Fetch data for all users
                 const allUsersData = await Promise.all(
-                    allUserIds.map(async (userId) => {
+                    allUserIds.map(async () => {
                         try {
                             // Fetch profile
-                            const profileResponse = await fetch(`/api/profiles/${userId}`);
-                            if (!profileResponse.ok) throw new Error(`Failed to fetch profile ${userId}`);
+                            const profileResponse = await fetch(`/api/profiles/${steamid}`);
+                            if (!profileResponse.ok) throw new Error(`Failed to fetch profile ${steamid}`);
                             const profileData = await profileResponse.json();
 
                             // Fetch games
-                            const gamesResponse = await fetch(`/api/games/${userId}`);
+                            const gamesResponse = await fetch(`/api/games/${steamid}`);
                             if (!gamesResponse.ok) {
                                 
                                 return {
-                                    steamid: userId,
+                                    steamid: steamid,
                                     personaname: profileData.personaname || "Unknown User",
                                     avatar: profileData.avatar || "/default-avatar.png",
                                     moneyWasted: 0,
-                                    isCurrentUser: userId === steamid,
+                                    isCurrentUser: steamid === steamid,
                                     hasGameData: false
                                 };
                             }
@@ -59,15 +59,15 @@ export default function Leaderboard() {
                                 .reduce((total, game) => total + (game.price || 0), 0);
                             
                             return {
-                                steamid: userId,
+                                steamid: steamid,
                                 personaname: profileData.personaname || "Unknown User",
                                 avatar: profileData.avatar || "/default-avatar.png",
                                 moneyWasted: moneyWasted / 100, // Convert from cents to euros
-                                isCurrentUser: userId === steamid,
+                                isCurrentUser: steamid === steamid,
                                 hasGameData: true
                             };
                         } catch (error) {
-                            console.error(`Error fetching data for ${userId}:`, error);
+
                             return null;
                         }
                     })
