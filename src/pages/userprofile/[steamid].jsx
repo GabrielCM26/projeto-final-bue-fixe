@@ -54,14 +54,6 @@ export default function UserProfile() {
 
         loadData();
     }, [steamid]);
-    
-    {/*if (loading) {
-        return (
-            <main className="min-h-screen flex justify-center items-center bg-gray-900 p-4">
-                <Loader />
-            </main>
-        );
-    }; */}
 
     {/* Página de carregamento */}
     if (!profile) {
@@ -74,8 +66,8 @@ export default function UserProfile() {
 
 
     return (
-        <main className="flex flex-col bg-linear-to-t from-black from-75% to-[#000D12] w-screen h-screen">
-            <div className="">
+        <main className="flex flex-col bg-linear-to-t from-black from-75% to-[#000D12] w-screen h-screen p-5">
+            <div className="flex flex-col items-center justify-center md:flex-row md:items-start">
 
                 {/* Foto de perfil */}
                 <img
@@ -87,7 +79,7 @@ export default function UserProfile() {
 
                     {/* Nome de Utilizador */}
                     <h1>
-                        <div className="text-sm text-gray-200 truncate max-w-24">
+                        <div className={`text-xl text-gray-200 ${aksharFont.className} font-medium `}>
                             {profile?.personaname || "user"}
                         </div>
                     </h1>
@@ -115,13 +107,13 @@ export default function UserProfile() {
             <div>
                 <h3>My most recent achievements</h3>
                 <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                    {[1, 2, 3, 4, 5].map((i) => (
                         <div
                             key={i}
                             className="flex-1 bg-[#2a2c33] rounded-md p-4 flex items-center justify-center"
                         >
                             <img
-                                src="game.chievements.icon"
+                                src="game.achievements.icon"
                                 alt={`Trophy ${i}`}
                                 className="w-8 h-8 object-contain opacity-80"
                             />
