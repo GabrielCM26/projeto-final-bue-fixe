@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Loader from '@/components/Loader';
-import { Link } from "lucide-react";
-import Image from "next/image";
+import Link from "next/link";
+
 export default function FriendsList() {
     const router = useRouter();
     const { steamid } = router.query;

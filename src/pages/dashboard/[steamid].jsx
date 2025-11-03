@@ -48,7 +48,7 @@ export default function Dashboard() {
         const dataGames = await resGames.json();
         setGames(dataGames);
 
-        // Total horas jogadas (somatÃ³rio em minutos -> horas arredondadas)
+        // Total horas jogadas  -> horas arredondadas)
         const totalMinutes = dataGames.reduce(
           (acc, game) => acc + (game.playtime_forever || 0),
           0
@@ -84,8 +84,6 @@ export default function Dashboard() {
 
           const coverUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${mostPlayed.appid}/library_600x900.jpg`;
 
-          const achievementsDone = mostPlayed.achievementsDone || 0;
-          const achievementsTotal = mostPlayed.achievementsTotal || 0;
 
           setBestGame({
             appid: mostPlayed.appid,
@@ -94,8 +92,6 @@ export default function Dashboard() {
             quote: "",
             cover: coverUrl,
             hoursPlayed,
-            achievementsDone,
-            achievementsTotal,
             lastPlayed: lastPlayedLabel,
           });
         } else {
