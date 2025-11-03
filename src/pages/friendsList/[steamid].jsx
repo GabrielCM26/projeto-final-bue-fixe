@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Loader from '@/components/Loader';
 import { Link } from "lucide-react";
-
+import Image from "next/image";
 export default function FriendsList() {
     const router = useRouter();
     const { steamid } = router.query;
@@ -124,7 +124,7 @@ export default function FriendsList() {
                                     rel="noopener noreferrer"
                                     className="block bg-[#2B303B] rounded-lg p-4 flex flex-col items-center hover:bg-[#3B404B] transition-colors cursor-pointer shadow-md"
                                 >
-                                    <img
+                                    <Image
                                         src={friend.avatar || '/default-avatar.png'}
                                         alt={friend.personaname}
                                         className="w-24 h-24 rounded-full mb-4"
