@@ -1,6 +1,22 @@
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { Jura } from "next/font/google";
+import { Akshar } from "next/font/google";
+
+const juraFont = Jura({
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const aksharFont = Akshar({
+  subsets: ["latin"],
+  weight: "variable",
+});
+
 
 export default function UserProfile() {
+    const router = useRouter();
+    const { steamid } = router.query;
 
     const [profile, setProfile] = useState(null);
     const [games, setGames] = useState([]);
@@ -32,15 +48,25 @@ export default function UserProfile() {
         loadData();
     }, [steamid]);
 
+    {/* Página de carregamento */}
+    if (!profile) {
+        return (
+            <main className="min-h-screen text-white flex justify-center items-center p-4">
+                <div className="text-gray-500 text-sm">Loading...</div>
+            </main>
+        );
+    }
+
+
     return (
-        <div>
+        <main className="bg-black w-screen h-screen">
             <div>
 
                 {/* Foto de perfil */}
                 <img
                     src={profile.avatar}
                     alt="avatar"
-                    className="w-full h-full object-cover"
+                    className="rounded-[10px] w-[94px] object-cover"
                 />
                 <div>
 
@@ -54,7 +80,22 @@ export default function UserProfile() {
 
                         {/* "Roles" com Genres */}
                         <ul>
-                            <li>Rhythm Game</li>
+                            <li>
+                                {game.genres && game.genres.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {game.genres.slice(0, 3).map((genre, index) => (
+              <span key={index} className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
+                {genre.description}
+              </span>
+            ))}
+            {game.genres.length > 3 && (
+              <span className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
+                +{game.genres.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -114,6 +155,6 @@ export default function UserProfile() {
                     </div>
                 </button>
             </div>
-        </div>
+        </main>
     )
 };
