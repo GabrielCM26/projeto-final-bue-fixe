@@ -248,7 +248,7 @@ export default function Dashboard() {
           <div className="bg-[#1a1a1a] rounded-md p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm font-semibold text-white">Money Wasted dos Amigos</div>
-              <a href={`/Leaderboard/${steamid}`} className="text-[10px] text-gray-400 hover:text-[#aae4c1]">See all</a>
+              <a href={`/leaderboard/${steamid}`} className="text-[10px] text-gray-400 hover:text-[#aae4c1]">See all</a>
             </div>
             {loadingFriendsMoney ? (
               <div className="text-xs text-gray-400">A carregar...</div>
