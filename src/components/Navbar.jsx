@@ -5,7 +5,6 @@ export default function Navbar() {
   const router = useRouter();
   const path = router.asPath;
 
-  // páginas onde NÃO queremos mostrar a navbar (ex: login)
   const hideOn = ["/", "/testLogin"];
   if (hideOn.includes(path)) {
     return null;
@@ -23,7 +22,7 @@ export default function Navbar() {
 
   const [active, setActive] = useState("home");
 
-  // atualiza a tab ativa conforme a rota atual
+  
   useEffect(() => {
     for (const [key, route] of Object.entries(ROUTES)) {
       if (path.startsWith(`/${route}`)) {
@@ -77,7 +76,7 @@ export default function Navbar() {
               }
             `}
           >
-            {/* ícone + glow */}
+            
             <div className="relative flex items-center justify-center">
               {item.icon}
               {active === item.key && (
