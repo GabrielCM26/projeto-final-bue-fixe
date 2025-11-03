@@ -23,7 +23,6 @@ const {
 } = require("./lib/steamapi");
 const { getWithBackoff } = require("./src/utils/dataProcessing");
 const mongoose = require("mongoose");
-const { pRateLimit } = require("p-ratelimit");
 
 // ===== ENDPOINTS DA API =====
 
@@ -92,25 +91,8 @@ app.post("/api/games", async (req, res) => {
   const profileID = req.body.steamid;
 
   try {
-    const posterLimit = pRateLimit({
-      interval: 1000,
-      rate: 25,
-      concurrency: 2,
-    });
-    
-    const limit = pRateLimit({
-      interval: 1000,
-      rate: 50,
-      concurrency: 3,
-    });
 
-    const gameLimit = pRateLimit({
-      interval: 1000,
-      rate: 100,
-      concurrency: 10,
-    });
-
-    const ownedGames = await gameLimit(() => getOwnedGames(profileID));
+    const ownedGames = await getOwnedGames(profileID);
     const friendsSteamIDs = await getfriendIDs(profileID);
   
     // const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
@@ -131,7 +113,7 @@ app.post("/api/games", async (req, res) => {
           friendGames.map(async (game) => {
             let price = 0;
             if (game.playtime_forever === 0) {
-              price = await limit(() => getLowestGamePrice(game.appid));
+              price = await getLowestGamePrice(game.appid);
               price = price ? price : 0;
             }
             // const achievements = await friendLimits(() =>
