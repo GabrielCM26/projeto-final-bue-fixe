@@ -39,7 +39,7 @@ const GameCard = ({ game }) => {
 
   return (
     <div
-      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px] bg-gray-900 inset-shadow-sm inset-shadow-emerald-800 relative h-56 hover:scale-125 hover:z-2"
+      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px] bg-black shadow-xs shadow-green-500/80 relative h-56 hover:scale-125 hover:z-2"
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
       onClick={handleCardClick}
