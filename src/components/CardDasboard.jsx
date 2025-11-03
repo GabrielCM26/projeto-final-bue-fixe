@@ -51,9 +51,7 @@ const CardDashboard = ({ bestGame }) => {
         <div className="text-sm text-indigo-500 font-medium mb-4">
           {hoursPlayed} hours played
         </div>
-        <div className="text-sm text-slate-400 mb-4 px-4">
-          Achievements: {achievementsDone} / {achievementsTotal}
-        </div>
+        {/* Achievements removed as requested */}
       </div>
     </div>
   );
