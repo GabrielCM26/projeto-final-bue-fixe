@@ -1,6 +1,7 @@
 ﻿import { useRouter } from "next/router";
 import { useState, useEffect, useMemo } from "react";
 import CardDashboard from "../../components/CardDasboard.jsx";
+import Loader from '@/components/Loader';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [friendsMoney, setFriendsMoney] = useState([]);
   const [loadingFriendsMoney, setLoadingFriendsMoney] = useState(false);
   const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [loading, setLoading] = useState(true);
 
 
   // Dinheiro em euros
@@ -29,7 +31,7 @@ export default function Dashboard() {
 useEffect(() => {
   const initializeUserIfNeeded = async () => {
     if (!steamid) return;
-    
+     setLoading(true);
     try {
       const profileCheck = await fetch(`/api/profiles/${steamid}`);
       
@@ -199,6 +201,7 @@ useEffect(() => {
         }
       } finally {
         if (!aborted) setLoadingFriendsMoney(false);
+        setLoading(false);
       }
     }
 
@@ -215,10 +218,10 @@ useEffect(() => {
   }, [games]);
 
   // LOADING STATE
-  if (!profile) {
+  if (loading) {
     return (
-      <main className="min-h-screen text-white flex justify-center items-center p-4 bg-[#121212]">
-        <div className="text-gray-500 text-sm">Loading...</div>
+      <main className="min-h-screen flex justify-center items-center bg-gray-900 p-4">
+        <Loader />
       </main>
     );
   }
