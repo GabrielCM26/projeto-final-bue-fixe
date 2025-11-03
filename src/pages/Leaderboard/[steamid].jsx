@@ -29,7 +29,7 @@ export default function Leaderboard() {
                 
                 // Fetch data for all users
                 const allUsersData = await Promise.all(
-                    allUserIds.map(async () => {
+                    allUserIds.map(async (steamid) => {
                         try {
                             // Fetch profile
                             const profileResponse = await fetch(`/api/profiles/${steamid}`);
