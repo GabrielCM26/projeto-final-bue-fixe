@@ -208,7 +208,7 @@ useEffect(() => {
     };
   }, [profile]);
 
-  // Total de money wasted do utilizador (soma dos preÃ§os)
+  // Total de money wasted do utilizador 
   const userMoneyWasted = useMemo(() => {
     if (!games || games.length === 0) return 0;
     return games.reduce((sum, g) => sum + (g.price || 0), 0);
