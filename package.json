@@ -24,7 +24,8 @@
     "passport": "^0.7.0",
     "passport-steam": "^1.0.18",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
