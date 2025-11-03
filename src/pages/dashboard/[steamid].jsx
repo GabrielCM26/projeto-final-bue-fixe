@@ -1,5 +1,5 @@
-﻿import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useState, useEffect, useMemo } from "react";
 import CardDashboard from "../../components/CardDasboard.jsx";
 
 export default function Dashboard() {
@@ -10,6 +10,19 @@ export default function Dashboard() {
   const [games, setGames] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [bestGame, setBestGame] = useState(null);
+  const [friendsMoney, setFriendsMoney] = useState([]);
+  const [loadingFriendsMoney, setLoadingFriendsMoney] = useState(false);
+
+  // Dinheiro em euros
+  const formatCurrency = (amountInt) => {
+    if (typeof amountInt !== "number") return "-";
+    const amount = amountInt / 100;
+    try {
+      return amount.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
+    } catch (e) {
+      return `€${amount.toFixed(2)}`;
+    }
+  };
 
   useEffect(() => {
     if (!steamid) return;
@@ -45,8 +58,7 @@ export default function Dashboard() {
         // BEST GAME (mais jogado)
         if (dataGames.length > 0) {
           const mostPlayed = [...dataGames].sort(
-            (a, b) =>
-              (b.playtime_forever || 0) - (a.playtime_forever || 0)
+            (a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)
           )[0];
 
           // horas jogadas desse jogo
@@ -54,8 +66,7 @@ export default function Dashboard() {
             (mostPlayed.playtime_forever || 0) / 60
           );
 
-          // última vez jogado (Steam dá epoch em segundos)
-          let lastPlayedLabel = "—";
+          let lastPlayedLabel = "-";
           if (mostPlayed.rtime_last_played) {
             const last = new Date(mostPlayed.rtime_last_played * 1000);
             const diffDays = Math.floor(
@@ -71,10 +82,8 @@ export default function Dashboard() {
             }
           }
 
-          
           const coverUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${mostPlayed.appid}/library_600x900.jpg`;
 
-       
           const achievementsDone = mostPlayed.achievementsDone || 0;
           const achievementsTotal = mostPlayed.achievementsTotal || 0;
 
@@ -82,7 +91,7 @@ export default function Dashboard() {
             appid: mostPlayed.appid,
             name: mostPlayed.name,
             developer: mostPlayed.developer || "",
-            quote: "", 
+            quote: "",
             cover: coverUrl,
             hoursPlayed,
             achievementsDone,
@@ -100,6 +109,69 @@ export default function Dashboard() {
     loadData();
   }, [steamid]);
 
+  // Carregar "money wasted" dos amigos e link para Steam
+  useEffect(() => {
+    if (!profile || !Array.isArray(profile.friends) || profile.friends.length === 0) {
+      setFriendsMoney([]);
+      return;
+    }
+
+    let aborted = false;
+    async function loadFriendsMoney() {
+      try {
+        setLoadingFriendsMoney(true);
+        const friendIds = profile.friends.slice(0, 25);
+        const results = await Promise.all(
+          friendIds.map(async (fid) => {
+            try {
+              const [resProf, resGames] = await Promise.all([
+                fetch(`/api/profiles/${fid}`),
+                fetch(`/api/games/${fid}`),
+              ]);
+
+              const friendProfile = resProf.ok ? await resProf.json() : null;
+              const friendGames = resGames.ok ? await resGames.json() : [];
+
+              const money = (friendGames || []).reduce(
+                (sum, g) => sum + (g.price || 0),
+                0
+              );
+
+              return {
+                steamid: fid,
+                personaname: friendProfile?.personaname || fid,
+                avatar: friendProfile?.avatar || null,
+                moneyWasted: money,
+              };
+            } catch (e) {
+              return null;
+            }
+          })
+        );
+
+        if (!aborted) {
+          const ordered = results
+            .filter(Boolean)
+            .sort((a, b) => (b.moneyWasted || 0) - (a.moneyWasted || 0));
+          setFriendsMoney(ordered);
+        }
+      } finally {
+        if (!aborted) setLoadingFriendsMoney(false);
+      }
+    }
+
+    loadFriendsMoney();
+    return () => {
+      aborted = true;
+    };
+  }, [profile]);
+
+  // Total de money wasted do utilizador (soma dos preços)
+  const userMoneyWasted = useMemo(() => {
+    if (!games || games.length === 0) return 0;
+    return games.reduce((sum, g) => sum + (g.price || 0), 0);
+  }, [games]);
+
   // LOADING STATE
   if (!profile) {
     return (
@@ -116,7 +188,6 @@ export default function Dashboard() {
       >
         {/* HEADER */}
         <header className="grid grid-cols-3 items-center">
-         
           <div></div>
 
           {/* Logo */}
@@ -128,7 +199,6 @@ export default function Dashboard() {
             />
           </div>
 
-         
           <div className="flex items-center gap-2 justify-end">
             <div className="text-sm text-gray-200 truncate max-w-24">
               {profile?.personaname || "user"}
@@ -144,9 +214,7 @@ export default function Dashboard() {
                   />
                 </a>
               ) : (
-                <div className="text-[10px] text-center leading-[1.75rem] text-gray-200">
-                  ?
-                </div>
+                <div className="text-[10px] text-center leading-[1.75rem] text-gray-200">?</div>
               )}
             </div>
           </div>
@@ -156,67 +224,70 @@ export default function Dashboard() {
 
         {/* RESTO DO DASHBOARD */}
         <div className="flex flex-col gap-5">
-          
           <div className="flex flex-col sm:flex-row gap-2 text-center">
             {/* HOURS PLAYED */}
             <div className="flex-1 bg-[#282828] rounded-md p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="text-white font-semibold text-lg">
-                {totalHours}
-              </div>
-              <div className="text-[10px] text-gray-400 uppercase tracking-wide">
-                Hours played
-              </div>
+              <div className="text-white font-semibold text-lg">{totalHours}</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide">Hours played</div>
             </div>
 
             {/* GAMES OWNED */}
             <div className="flex-1 bg-[#282828] rounded-md p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="text-white font-semibold text-lg">
-                {games.length}
-              </div>
-              <div className="text-[10px] text-gray-400 uppercase tracking-wide">
-                Games owned
-              </div>
+              <div className="text-white font-semibold text-lg">{games.length}</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide">Games owned</div>
             </div>
           </div>
 
-          {/* Money Wasted */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <button className="flex-1 flex items-center justify-center gap-2 bg-[#282828] rounded-md py-3 px-2 text-xs text-gray-300 hover:bg-gray-700 transition">
-              <img
-                src="/ListaIcon1.png"
-                alt="list icon"
-                className="w-9 h-9 opacity-80"
-              />
-              <span className="text-left leading-tight">
-                Suggested <br /> Games
-              </span>
-            </button>
-
-            <button className="flex-1 flex items-center justify-center gap-2 bg-[#282828] rounded-md py-3 px-2 text-xs text-gray-300 hover:bg-gray-700 transition">
-              <img
-                src="/money.png"
-                alt="money icon"
-                className="w-9 h-9 opacity-80"
-              />
-              <span className="text-left leading-tight">
-                Money
-                <br /> Wasted
-              </span>
-            </button>
+          {/* Money Wasted total (sem imagens) */}
+          <div className="bg-[#1a1a1a] rounded-md p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-white">Money Wasted</span>
+              <span className="text-sm font-semibold text-red-400">{formatCurrency(userMoneyWasted)}</span>
+            </div>
           </div>
 
-
-          
-
-
-
+          {/* Friends' Money Wasted */}
+          <div className="bg-[#1a1a1a] rounded-md p-3">
+            <div className="text-sm font-semibold text-white mb-2">Money Wasted dos Amigos</div>
+            {loadingFriendsMoney ? (
+              <div className="text-xs text-gray-400">A carregar...</div>
+            ) : friendsMoney.length === 0 ? (
+              <div className="text-xs text-gray-400">Sem dados dos amigos.</div>
+            ) : (
+              <ul className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                {friendsMoney.slice(0, 10).map((f, idx) => (
+                  <li key={f.steamid} className="flex items-center gap-2 bg-[#282828] rounded-md p-2">
+                    <div className="text-xs text-gray-400 w-5 text-center">{idx + 1}</div>
+                    <a
+                      href={`https://steamcommunity.com/profiles/${f.steamid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 flex-1 min-w-0"
+                    >
+                      <div className="w-8 h-8 bg-gray-700 rounded overflow-hidden shrink-0">
+                        {f.avatar ? (
+                          <img src={f.avatar} alt={f.personaname} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gray-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-white truncate">{f.personaname}</div>
+                        <div className="text-[10px] text-gray-400 truncate">{f.steamid}</div>
+                      </div>
+                    </a>
+                    <div className="text-sm font-semibold text-red-400 whitespace-nowrap">{formatCurrency(f.moneyWasted)}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Debug / info */}
-        <div className="text-[10px] text-gray-500 pt-2">
-          steamid atual: {steamid || "(sem steamid )"}
-        </div>
+        <div className="text-[10px] text-gray-500 pt-2">steamid atual: {steamid || "(sem steamid )"}</div>
       </section>
     </main>
   );
 }
+

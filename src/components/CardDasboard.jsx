@@ -28,7 +28,7 @@ const CardDashboard = ({ bestGame }) => {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
-      className="relative w-80 h-96 rounded-xl p-px bg-gray-900 backdrop-blur-md text-gray-800 overflow-hidden shadow-lg cursor-pointer"
+      className="relative w-64 h-auto rounded-xl p-px bg-gray-900 backdrop-blur-md text-gray-800 overflow-hidden shadow-lg cursor-pointer mx-auto"
     >
       {/* Efeito de luz que segue o rato */}
       <div
@@ -39,11 +39,11 @@ const CardDashboard = ({ bestGame }) => {
       />
 
       {/* Conteúdo */}
-      <div className="relative z-10 bg-gray-900/75 p-2 h-full w-full rounded-[4px] flex flex-col items-center justify-center text-center">
+      <div className="relative z-10 bg-gray-900/75 p-3 w-full rounded-[4px] flex flex-col items-center justify-center text-center">
         <img
           src={cover}
           alt={`${name} cover`}
-          className="w-30 h-48 rounded-md shadow-md my-2 object-cover"
+          className="w-24 h-36 rounded-md shadow-md my-2 object-cover mx-auto"
         />
         <h2 className="text-2xl font-bold text-white mb-1">
           {name}
