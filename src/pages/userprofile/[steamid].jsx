@@ -20,7 +20,12 @@ export default function UserProfile() {
 
     const [profile, setProfile] = useState(null);
     const [games, setGames] = useState([]);
-    const [totalHours, setTotalHours] = useState(0);
+    // const [totalHours, setTotalHours] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    // const [searchTerm, setSearchTerm] = useState('');
+    // const [sortBy, setSortBy] = useState('name');
+    // const [sortOrder, setSortOrder] = useState('desc');
 
     useEffect(() => {
         if (!steamid) return;
@@ -34,19 +39,29 @@ export default function UserProfile() {
                 setProfile(dataProfile);
                 console.log("PROFILE DATA", dataProfile);
 
-                // Games  
+                // Fetch games
                 const resGames = await fetch(`/api/games/${steamid}`);
+                if (!resGames.ok) throw new Error("Failed to fetch games");
                 const dataGames = await resGames.json();
                 setGames(dataGames);
-                console.log("GAMES DATA", dataGames);
-
             } catch (error) {
                 console.error("Failed to load profile/games:", error);
+                setError(error.message);
+            } finally {
+                setLoading(false);
             }
         }
 
         loadData();
     }, [steamid]);
+    
+    {/*if (loading) {
+        return (
+            <main className="min-h-screen flex justify-center items-center bg-gray-900 p-4">
+                <Loader />
+            </main>
+        );
+    }; */}
 
     {/* Página de carregamento */}
     if (!profile) {
@@ -79,24 +94,20 @@ export default function UserProfile() {
                     <div>
 
                         {/* "Roles" com Genres */}
-                        <ul>
-                            <li>
-                                {game.genres && game.genres.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {game.genres.slice(0, 3).map((genre, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
-                {genre.description}
-              </span>
-            ))}
-            {game.genres.length > 3 && (
-              <span className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
-                +{game.genres.length - 3}
-              </span>
-            )}
-          </div>
-        )}
-                            </li>
-                        </ul>
+                        {game.genres && game.genres.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                                {game.genres.slice(0, 3).map((genre, index) => (
+                                <span key={index} className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
+                                    {genre.description}
+                                </span>
+                                ))}
+                                {game.genres.length > 3 && (
+                                <span className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
+                                    +{game.genres.length - 3}
+                                </span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
