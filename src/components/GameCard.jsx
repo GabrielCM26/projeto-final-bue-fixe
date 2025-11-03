@@ -16,6 +16,14 @@ const GameCard = ({ game }) => {
     setTilt({ x: 0, y: 0 });
   };
 
+  const handleCardClick = () => {
+    if (game.appid) {
+      const steamUrl = `https://store.steampowered.com/app/${game.appid}`;
+      window.open(steamUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      console.warn('No Steam App ID available for this game:', game.name);
+    }
+  };
 
 
   // Format playtime hours
@@ -31,9 +39,10 @@ const GameCard = ({ game }) => {
 
   return (
     <div
-      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px]  bg-gray-900 inset-shadow-sm inset-shadow-emerald-800 relative h-56 hover:scale-125 hover:z-2"
+      className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer w-full max-w-[175px] bg-gray-900 inset-shadow-sm inset-shadow-emerald-800 relative h-56 hover:scale-125 hover:z-2"
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
+      onClick={handleCardClick}
       style={{
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
       }}
@@ -81,9 +90,11 @@ const GameCard = ({ game }) => {
         )}
         {/* Genres */}
         {game.genres && game.genres.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 overflow-hidden w-full">
             {game.genres.slice(0, 3).map((genre, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
+              <span key={index}
+                className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300 whitespace-nowrap truncate"
+                style={{ maxWidth: '70%' }}>
                 {genre.description}
               </span>
             ))}
@@ -96,7 +107,6 @@ const GameCard = ({ game }) => {
         )}
       </div>
     </div>
-
   );
 };
 
