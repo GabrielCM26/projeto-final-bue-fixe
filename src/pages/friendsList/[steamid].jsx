@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Loader from '@/components/Loader';
-import { Link } from "lucide-react";
+import Link from "next/link";
 
 export default function FriendsList() {
     const router = useRouter();
