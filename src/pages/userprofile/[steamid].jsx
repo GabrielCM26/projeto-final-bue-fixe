@@ -74,8 +74,8 @@ export default function UserProfile() {
 
 
     return (
-        <main className="bg-black w-screen h-screen">
-            <div>
+        <main className="flex flex-col bg-linear-to-t from-black from-75% to-[#000D12] w-screen h-screen">
+            <div className="">
 
                 {/* Foto de perfil */}
                 <img
@@ -94,7 +94,7 @@ export default function UserProfile() {
                     <div>
 
                         {/* "Roles" com Genres */}
-                        {game.genres && game.genres.length > 0 && (
+                        {/* {game.genres && game.genres.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                                 {game.genres.slice(0, 3).map((genre, index) => (
                                 <span key={index} className="px-2 py-1 bg-gray-700 text-[10px] rounded-full text-gray-300">
@@ -107,7 +107,7 @@ export default function UserProfile() {
                                 </span>
                                 )}
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>
