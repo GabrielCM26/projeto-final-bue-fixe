@@ -45,7 +45,7 @@ export default function Leaderboard() {
                                     personaname: profileData.personaname || "Unknown User",
                                     avatar: profileData.avatar || "/default-avatar.png",
                                     moneyWasted: 0,
-                                    isCurrentUser: steamid === steamid,
+                                    isCurrentUser: steamid === router.query.steamid,
                                     hasGameData: false
                                 };
                             }
