@@ -12,6 +12,8 @@ export default function Dashboard() {
   const [bestGame, setBestGame] = useState(null);
   const [friendsMoney, setFriendsMoney] = useState([]);
   const [loadingFriendsMoney, setLoadingFriendsMoney] = useState(false);
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+
 
   // Dinheiro em euros
   const formatCurrency = (amountInt) => {
@@ -23,6 +25,45 @@ export default function Dashboard() {
       return `â‚¬${amount.toFixed(2)}`;
     }
   };
+
+useEffect(() => {
+  const initializeUserIfNeeded = async () => {
+    if (!steamid) return;
+    
+    try {
+      const profileCheck = await fetch(`/api/profiles/${steamid}`);
+      
+      if (!profileCheck.ok) {
+        console.log('Profile not found, initializing user...');
+        
+        await fetch('/api/profiles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ steamid })
+        });
+        
+        await fetch('/api/games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ steamid })
+        });
+        
+        console.log('User initialization complete');
+      }
+   
+
+      
+      setShouldRefetch(true);
+    }
+   catch (error) {
+    console.error('Error during user initialization:', error);
+  }
+};
+
+  initializeUserIfNeeded();
+}, [steamid]);
+
+
 
   useEffect(() => {
     if (!steamid) return;
@@ -103,7 +144,12 @@ export default function Dashboard() {
     }
 
     loadData();
-  }, [steamid]);
+    
+    // Reset refetch trigger after loading
+    if (shouldRefetch) {
+      setShouldRefetch(false);
+    }
+  }, [steamid, shouldRefetch]);
 
   // Carregar "money wasted" dos amigos e link para Steam
   useEffect(() => {
