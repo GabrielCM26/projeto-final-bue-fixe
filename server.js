@@ -93,8 +93,35 @@ app.post("/api/games", async (req, res) => {
   try {
 
     const ownedGames = await getOwnedGames(profileID);
-    const friendsSteamIDs = await getfriendIDs(profileID);
+    const friendsSteamIDs = await getfriendIDs(profileID)
+    // const limitedFriends = friendsSteamIDs.friendIDs.slice(0, 10);
+    const uniqueUnplayedGames = new Set();
+    ownedGames.forEach(game => {
+      if (game.playtime_forever === 0) {
+        uniqueUnplayedGames.add(game.appid);
+      }
+    });
   
+
+    const friendGamesPromises = friendsSteamIDs.friendIDs.map(friend => 
+      getOwnedGames(friend)
+    );
+    const allFriendGames = await Promise.all(friendGamesPromises);
+    
+    allFriendGames.forEach(friendGames => {
+      friendGames.forEach(game => {
+        if (game.playtime_forever === 0) {
+          uniqueUnplayedGames.add(game.appid);
+        }
+      });
+    });
+
+    console.log(`🎯 Pre-fetching prices for ${uniqueUnplayedGames.size} unique games`);
+    const pricePromises = Array.from(uniqueUnplayedGames).map(appid => 
+      getLowestGamePrice(appid)
+    );
+    await Promise.all(pricePromises);
+    console.log(`✅ All prices cached!`);
     // const allSteamIDs = [profileID, ...friendsSteamIDs.friendIDs];
     // const uniqueGames = await findCommonGames(allSteamIDs);
     // await preloadGameSchemas(ownedGames);
@@ -103,7 +130,7 @@ app.post("/api/games", async (req, res) => {
     // console.log("UniqueGames for schema preload:", uniqueGames);
 
     const friendGamesWithAchievements = await Promise.all(
-      friendsSteamIDs.friendIDs.map(async (friend) => {
+      ownedGames.map(async (friend) => {
         const friendGames = await getOwnedGames(friend);
         if (friendGames.length === 0) {
           return [];
