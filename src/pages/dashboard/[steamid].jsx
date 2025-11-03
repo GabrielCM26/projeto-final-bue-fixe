@@ -112,23 +112,7 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen text-white flex justify-center p-6 md:p-9 bg-[#121212]">
       <section
-        className="
-          w-full
-          max-w-sm
-          sm:max-w-md
-          md:max-w-2xl
-          lg:max-w-4xl
-          xl:max-w-5xl
-          bg-[#1E1E1E]
-          rounded-2xl
-          p-4
-          md:p-6
-          flex
-          flex-col
-          gap-6
-          shadow-xl
-          shadow-black/40
-        "
+        className="w-full max-w-[440px] md:max-w-[75%] bg-linear-to-t from-[#000d12] from-88% to-[#001334] rounded-2xl p-4 flex flex-col gap-6 shadow-xl"
       >
         {/* HEADER */}
         <header className="grid grid-cols-3 items-center">
