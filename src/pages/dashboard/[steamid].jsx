@@ -155,7 +155,7 @@ export default function Dashboard() {
         <CardDashboard bestGame={bestGame} />
 
         {/* RESTO DO DASHBOARD */}
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-5">
           
           <div className="flex flex-col sm:flex-row gap-2 text-center">
             {/* HOURS PLAYED */}
@@ -179,7 +179,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Suggested Games / Money Wasted */}
+          {/* Money Wasted */}
           <div className="flex flex-col sm:flex-row gap-2">
             <button className="flex-1 flex items-center justify-center gap-2 bg-[#282828] rounded-md py-3 px-2 text-xs text-gray-300 hover:bg-gray-700 transition">
               <img
@@ -205,32 +205,11 @@ export default function Dashboard() {
             </button>
           </div>
 
-        
 
-          {/* BEST ACHIEVEMENTS */}
-          <div className="bg-[#282828] rounded-md p-3 flex flex-col gap-4 transition-all duration-300 hover:shadow-lg">
-            <div className="text-xs text-gray-200 font-medium">
-              Best achievements
-            </div>
+          
 
-            <div className="flex gap-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex-1 flex flex-col items-center justify-center text-center text-[11px] text-gray-300"
-                >
-                  <div className="w-10 h-10 bg-gray-700 rounded flex items-center justify-center overflow-hidden mb-2">
-                    <img
-                      src="/trophy-placeholder.png"
-                      alt={`Trophy ${i}`}
-                      className="w-8 h-8 object-contain opacity-80"
-                    />
-                  </div>
-                  <div className="leading-tight">Tron</div>
-                </div>
-              ))}
-            </div>
-          </div>
+
+
         </div>
 
         {/* Debug / info */}

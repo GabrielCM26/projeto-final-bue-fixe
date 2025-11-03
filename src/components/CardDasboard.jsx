@@ -3,7 +3,7 @@ import React from "react";
 const CardDashboard = ({ bestGame }) => {
   if (!bestGame) {
     return (
-      <div className="relative w-89 h-40 rounded-xl p-px bg-gray-900 backdrop-blur-md text-gray-800 overflow-hidden shadow-lg cursor-pointer">
+      <div className="relative w-20 h-25 rounded-xl p-px bg-gray-900 backdrop-blur-md text-gray-800 overflow-hidden shadow-lg cursor-pointer">
         <div className="relative z-10 bg-gray-900/75 p-6 h-full w-full rounded-[11px] flex flex-col items-center justify-center text-center">
           <p className="text-white">No game data available.</p>
         </div>
@@ -39,11 +39,11 @@ const CardDashboard = ({ bestGame }) => {
       />
 
       {/* Conteúdo */}
-      <div className="relative z-10 bg-gray-900/75 p-6 h-full w-full rounded-[11px] flex flex-col items-center justify-center text-center">
+      <div className="relative z-10 bg-gray-900/75 p-2 h-full w-full rounded-[4px] flex flex-col items-center justify-center text-center">
         <img
           src={cover}
           alt={`${name} cover`}
-          className="w-32 h-48 rounded-md shadow-md my-4 object-cover"
+          className="w-30 h-48 rounded-md shadow-md my-2 object-cover"
         />
         <h2 className="text-2xl font-bold text-white mb-1">
           {name}
