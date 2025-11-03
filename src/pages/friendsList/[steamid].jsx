@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Loader from '@/components/Loader';
+import { Link } from "lucide-react";
 
 export default function FriendsList() {
     const router = useRouter();
@@ -116,9 +117,9 @@ export default function FriendsList() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {filteredFriends.length > 0 ? (
                             filteredFriends.map((friend) => (
-                                <a
+                                <Link
                                     key={friend.steamid}
-                                    href={`https://steamcommunity.com/profiles/${friend.steamid}`}
+                                    href={`/dashboard/${friend.steamid}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block bg-[#2B303B] rounded-lg p-4 flex flex-col items-center hover:bg-[#3B404B] transition-colors cursor-pointer shadow-md"
@@ -139,7 +140,7 @@ export default function FriendsList() {
                                     <p className="text-gray-400 text-sm text-center">
                                         Friends since: {friend.friendsSince ? new Date(friend.friendsSince).toLocaleDateString() : 'Unknown'}
                                     </p>
-                                </a>
+                                </Link>
                             ))
                         ) : (
                             <div className="text-gray-400 text-center py-8 col-span-full">
