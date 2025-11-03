@@ -175,11 +175,12 @@ app.post("/api/games", async (req, res) => {
 
     const gamesWithAchievements = await Promise.all(
       ownedGames.map(async (game) => {
-        const poster = await posterLimit(() => getGamePosters(game.appid));
+        const poster = await getGamePosters(game.appid);
+        const steamURL = `https://store.steampowered.com/app/${game.appid}`;
         const genres = await getGameGenres(game.appid);
         let price = 0;
         if (game.playtime_forever === 0) {
-          price = await limit(() => getLowestGamePrice(game.appid));
+          price = await getLowestGamePrice(game.appid);
           price = price ? price : 0;
         }
 
@@ -206,6 +207,7 @@ app.post("/api/games", async (req, res) => {
           name: game.name,
           img_icon_url: game.img_icon_url,
           poster: poster,
+          steamURL: steamURL,
           playtime_forever: game.playtime_forever,
           achievements: mappedAchievements,
           genres: mappedGenres,
